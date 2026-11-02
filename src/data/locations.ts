@@ -38,3 +38,10 @@ export function addLocation(category: string, name: string): LocationItem[] {
     }
     return updated;
 }
+// 지역 삭제 함수 추가
+export function deleteLocation(id: string) {
+    if (typeof window === 'undefined') return;
+    const locations = getLocations();
+    const filtered = locations.filter((item) => item.id !== id);
+    localStorage.setItem('yoyang_locations', JSON.stringify(filtered));
+  }
