@@ -4,9 +4,9 @@ export function SiteHeader({ right }: { right?: React.ReactNode }) {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2" aria-label="요양웹 처음으로">
+        <Link href="/" className="flex items-center gap-2" aria-label="요양매칭 처음으로">
           <Mark />
-          <span className="text-[1.15rem] font-extrabold tracking-tight text-pine-deep">요양웹</span>
+          <span className="text-[1.15rem] font-extrabold tracking-tight text-pine-deep">요양매칭</span>
           <span className="hidden text-sm text-muted sm:inline">서울·경기 요양 구인구직</span>
         </Link>
         <nav className="flex items-center gap-1 text-[0.94rem]">{right}</nav>
@@ -35,7 +35,7 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-line bg-white">
       <div className="mx-auto max-w-5xl space-y-1 px-4 py-6 text-sm text-muted">
-        <p className="font-semibold text-ink">요양웹 · yoyangmatch.com</p>
+        <p className="font-semibold text-ink">요양매칭 · yoyangmatch.com</p>
         <p>방문요양·주야간보호·요양원과 요양보호사를 잇는 수도권 구인구직 서비스</p>
         <p className="flex gap-3 pt-1">
           <Link href="/seekers/manage" className="underline underline-offset-2">내 구직 글 관리</Link>

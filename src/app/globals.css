@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* 요양웹 색상·글꼴 기준 */
+/* 요양매칭 색상·글꼴 기준 */
 @theme {
   --color-pine: #1e5245;
   --color-pine-deep: #133a31;
