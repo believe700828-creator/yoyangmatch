@@ -3,7 +3,7 @@ import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 import "./globals.css";
 
 // 검색엔진 소유 확인 코드: 네이버 서치어드바이저 / 구글 서치콘솔에서 받은 content 값을 넣으세요
-const NAVER_VERIFICATION = "";
+const NAVER_VERIFICATION = "d4e3c8a9124ea542f87ea7b7af3a5b383d3eca9b";
 const GOOGLE_VERIFICATION = "";
 
 export const metadata: Metadata = {
