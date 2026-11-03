@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 // 운영 정보: 바뀌면 여기만 고치고 시행일을 새 날짜로 바꾸세요
 const OPERATOR = "서연컴퍼니";
 const OFFICER = "요양매칭 운영팀";
-const PHONE = "010-7725-8909";
+const PHONE = "0504-007-8909";
 const EMAIL = "believe700828@gmail.com";
 const EFFECTIVE = "2026년 11월 3일";
 
