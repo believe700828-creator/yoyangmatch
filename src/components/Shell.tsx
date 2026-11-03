@@ -36,8 +36,10 @@ export function SiteFooter() {
     <footer className="border-t border-line bg-white">
       <div className="mx-auto max-w-5xl space-y-1 px-4 py-6 text-sm text-muted">
         <p className="font-semibold text-ink">요양매칭 · yoyangmatch.com</p>
+        <p>운영: 서연컴퍼니 · 문의 010-7725-8909</p>
         <p>방문요양·주야간보호·요양원과 요양보호사를 잇는 수도권 구인구직 서비스</p>
-        <p className="flex gap-3 pt-1">
+        <p className="flex flex-wrap gap-x-3 gap-y-1 pt-1">
+          <Link href="/privacy" className="font-bold text-ink underline underline-offset-2">개인정보 처리방침</Link>
           <Link href="/seekers/manage" className="underline underline-offset-2">내 구직 글 관리</Link>
           <Link href="/org" className="underline underline-offset-2">기관 페이지</Link>
           <Link href="/admin" className="underline underline-offset-2">관리자</Link>

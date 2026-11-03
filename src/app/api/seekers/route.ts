@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getOrgId, hashPassword } from "@/lib/auth";
-import { getAll, getOne, putOne } from "@/lib/db";
+import { deleteOne, getAll, getOne, putOne } from "@/lib/db";
 import { addDays, clean, fail, getSettings, handle, newId, onlyDigits, toPublicSeeker } from "@/lib/data";
 import { FACILITIES, REGIONS, type Facility, type Org, type Region, type Seeker } from "@/lib/types";
 
@@ -12,7 +12,11 @@ export async function GET() {
     const orgId = await getOrgId();
     const org = orgId ? await getOne<Org>("orgs", orgId) : null;
     const now = Date.now();
-    const list = (await getAll<Seeker>("seekers"))
+    const all = await getAll<Seeker>("seekers");
+    // 개인정보 처리방침: 노출 기간이 끝나고 30일이 지난 구직 글은 자동 삭제
+    const stale = all.filter((s) => new Date(s.expiresAt).getTime() + 30 * 864e5 < now);
+    await Promise.all(stale.map((s) => deleteOne("seekers", s.id)));
+    const list = all
       .filter((s) => s.status === "active" && new Date(s.expiresAt).getTime() > now)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return NextResponse.json({ seekers: list.map((s) => toPublicSeeker(s, Boolean(org))), canSeeContact: Boolean(org) });

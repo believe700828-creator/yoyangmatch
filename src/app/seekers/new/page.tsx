@@ -117,9 +117,15 @@ export default function NewSeekerPage() {
               <ul className="mt-1 list-disc space-y-0.5 pl-5 text-muted">
                 <li>수집 항목: 이름, 휴대폰 번호, 희망 지역·근무 형태, 경력 등 입력하신 내용</li>
                 <li>목적: 요양기관에 구직 정보 제공 및 채용 연락</li>
-                <li>보관: 노출 기간 종료 또는 삭제 요청 시까지</li>
+                <li>제공받는 자: 사이트에 로그인한 요양기관 회원 (연락처·구직 정보)</li>
+                <li>보관: 노출 기간 종료 후 30일 뒤 자동 삭제, 그 전에도 언제든 삭제 가능</li>
                 <li>동의하지 않으실 수 있으며, 이 경우 등록할 수 없어요.</li>
               </ul>
+              <p className="mt-2 text-muted">
+                자세한 내용은{" "}
+                <Link href="/privacy" target="_blank" className="font-semibold text-pine underline underline-offset-2">개인정보 처리방침</Link>
+                을 확인해 주세요.
+              </p>
               <label className="mt-3 flex cursor-pointer items-center gap-3">
                 <input type="checkbox" className="h-5 w-5 accent-[#1e5245]" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
                 <span className="font-semibold">위 내용에 동의합니다</span>
