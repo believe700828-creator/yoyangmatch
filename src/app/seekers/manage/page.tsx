@@ -134,6 +134,17 @@ export default function ManageSeekerPage() {
               )}
               {posts.length === 0 && <Notice>남아 있는 구직 글이 없어요.</Notice>}
             </ul>
+            {posts.length > 0 && (
+              <SeekerPinForm
+                phone={phone}
+                password={password}
+                onChanged={(pin) => {
+                  setPassword(pin);
+                  setError("");
+                  setOk("비밀번호 4자리를 바꿨어요. 다음부터 새 번호로 불러오세요.");
+                }}
+              />
+            )}
           </div>
         )}
       </PageBody>
@@ -225,6 +236,63 @@ function SeekerEditForm({
       <div className="grid grid-cols-2 gap-2">
         <button type="button" className="btn-ghost" onClick={onCancel} disabled={busy}>취소</button>
         <button className="btn-primary" disabled={busy}>{busy ? "저장하는 중…" : "수정 내용 저장"}</button>
+      </div>
+    </form>
+  );
+}
+
+// 요양보호사가 비밀번호 4자리를 직접 변경 (지금 번호로 불러온 상태에서)
+function SeekerPinForm({ phone, password, onChanged }: { phone: string; password: string; onChanged: (pin: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [next, setNext] = useState("");
+  const [again, setAgain] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  if (!open) {
+    return (
+      <button className="btn-ghost w-full" onClick={() => setOpen(true)}>
+        비밀번호 4자리 바꾸기
+      </button>
+    );
+  }
+  return (
+    <form
+      className="space-y-4 rounded-2xl border border-line bg-white p-4"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setError("");
+        if (!/^\d{4}$/.test(next)) return setError("새 비밀번호는 숫자 4자리로 정해 주세요.");
+        if (next !== again) return setError("두 칸의 번호가 서로 달라요. 다시 확인해 주세요.");
+        setBusy(true);
+        try {
+          await api("/api/seekers/manage", { phone, password, action: "password", newPassword: next });
+          onChanged(next);
+          setNext(""); setAgain("");
+          setOpen(false);
+        } catch (err) {
+          setError((err as Error).message);
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      <p className="font-bold">비밀번호 4자리 바꾸기</p>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="field-label" htmlFor="pin-new">새 번호</label>
+          <input id="pin-new" className="field tracking-[0.4em]" type="password" inputMode="numeric" maxLength={4} value={next} onChange={(e) => setNext(e.target.value.replace(/\D/g, ""))} required />
+        </div>
+        <div>
+          <label className="field-label" htmlFor="pin-again">한 번 더</label>
+          <input id="pin-again" className="field tracking-[0.4em]" type="password" inputMode="numeric" maxLength={4} value={again} onChange={(e) => setAgain(e.target.value.replace(/\D/g, ""))} required />
+        </div>
+      </div>
+      <p className="text-sm text-muted">이 휴대폰 번호로 등록한 구직 글 모두 새 번호로 바뀌어요.</p>
+      {error && <Notice tone="error">{error}</Notice>}
+      <div className="grid grid-cols-2 gap-2">
+        <button type="button" className="btn-ghost" onClick={() => { setOpen(false); setError(""); }} disabled={busy}>취소</button>
+        <button className="btn-primary" disabled={busy}>{busy ? "바꾸는 중…" : "변경하기"}</button>
       </div>
     </form>
   );

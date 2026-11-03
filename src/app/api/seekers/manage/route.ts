@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { verifyPassword } from "@/lib/auth";
+import { hashPassword, verifyPassword } from "@/lib/auth";
 import { deleteOne, getAll, putOne } from "@/lib/db";
 import { addDays, clean, daysLeft, fail, getSettings, handle, onlyDigits } from "@/lib/data";
 import { FACILITIES, REGIONS, type Facility, type Region, type Seeker } from "@/lib/types";
@@ -18,6 +18,16 @@ export async function POST(req: Request) {
       (s) => s.phone === phone && s.status !== "hidden" && verifyPassword(password, s.pwHash),
     );
     if (mine.length === 0) return fail("일치하는 구직 글이 없습니다. 번호와 비밀번호를 확인해 주세요.", 404);
+
+    if (b.action === "password") {
+      const next = String(b.newPassword ?? "");
+      if (!/^\d{4}$/.test(next)) return fail("새 비밀번호는 숫자 4자리로 정해 주세요.");
+      if (next === password) return fail("지금과 다른 번호로 정해 주세요.");
+      // 이 번호로 등록한 내 글 전체의 비밀번호를 함께 바꿉니다
+      const pwHash = hashPassword(next);
+      await Promise.all(mine.map((s) => putOne("seekers", { ...s, pwHash })));
+      return NextResponse.json({ ok: true, changed: mine.length });
+    }
 
     const target = b.id ? mine.find((s) => s.id === b.id) : null;
     if (b.action && !target) return fail("해당 글을 찾을 수 없습니다.", 404);

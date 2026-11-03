@@ -188,6 +188,8 @@ function OrgDashboard() {
               </ul>
             )}
 
+            <OrgPasswordForm />
+
             {me.orders.length > 0 && (
               <>
                 <h2 className="mt-8 text-[1.2rem] font-extrabold">결제 내역</h2>
@@ -206,5 +208,68 @@ function OrgDashboard() {
       </PageBody>
       <SiteFooter />
     </>
+  );
+}
+
+// 로그인한 기관이 비밀번호를 직접 변경
+function OrgPasswordForm() {
+  const [open, setOpen] = useState(false);
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [again, setAgain] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [ok, setOk] = useState("");
+
+  if (!open) {
+    return (
+      <div className="mt-8">
+        {ok && <div className="mb-3"><Notice tone="ok">{ok}</Notice></div>}
+        <button className="btn-ghost w-full" onClick={() => { setOpen(true); setOk(""); }}>
+          비밀번호 변경
+        </button>
+      </div>
+    );
+  }
+  return (
+    <form
+      className="mt-8 space-y-4 rounded-2xl border border-line bg-white p-4"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setError("");
+        if (next.length < 6) return setError("새 비밀번호는 6자리 이상으로 정해 주세요.");
+        if (next !== again) return setError("새 비밀번호 두 칸이 서로 달라요. 다시 확인해 주세요.");
+        setBusy(true);
+        try {
+          await api("/api/org/password", { current, next });
+          setCurrent(""); setNext(""); setAgain("");
+          setOpen(false);
+          setOk("비밀번호를 바꿨어요. 다음 로그인부터 새 비밀번호를 쓰세요.");
+        } catch (err) {
+          setError((err as Error).message);
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      <h2 className="text-[1.2rem] font-extrabold">비밀번호 변경</h2>
+      <div>
+        <label className="field-label" htmlFor="pw-cur">현재 비밀번호</label>
+        <input id="pw-cur" type="password" className="field" value={current} onChange={(e) => setCurrent(e.target.value)} autoComplete="current-password" required />
+      </div>
+      <div>
+        <label className="field-label" htmlFor="pw-new">새 비밀번호 <span className="font-normal text-muted">(6자리 이상)</span></label>
+        <input id="pw-new" type="password" className="field" value={next} onChange={(e) => setNext(e.target.value)} autoComplete="new-password" required minLength={6} />
+      </div>
+      <div>
+        <label className="field-label" htmlFor="pw-again">새 비밀번호 한 번 더</label>
+        <input id="pw-again" type="password" className="field" value={again} onChange={(e) => setAgain(e.target.value)} autoComplete="new-password" required />
+      </div>
+      {error && <Notice tone="error">{error}</Notice>}
+      <div className="grid grid-cols-2 gap-2">
+        <button type="button" className="btn-ghost" onClick={() => { setOpen(false); setError(""); }} disabled={busy}>취소</button>
+        <button className="btn-primary" disabled={busy}>{busy ? "바꾸는 중…" : "변경하기"}</button>
+      </div>
+    </form>
   );
 }
