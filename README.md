@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 요양웹 (yoyangmatch.com)
 
-## Getting Started
+서울·경기 방문요양 / 주야간보호 / 요양원 요양보호사 구인구직 사이트
 
-First, run the development server:
+## 화면 구성
 
-```bash
+| 주소 | 내용 |
+|---|---|
+| `/` | 메인: 일자리 찾기(구인공고) / 요양보호사 찾기(인재정보) 탭, 기관유형·지역 필터 |
+| `/jobs/new` | 기관 구인공고 등록 (기관 로그인 필요) |
+| `/seekers/new` | 요양보호사 구직 등록 (가입 없이, 비밀번호 4자리로 관리) |
+| `/seekers/manage` | 요양보호사 내 구직 글 마감·삭제 |
+| `/org` | 기관 로그인·가입, 내 공고 관리, 결제·연장 |
+| `/admin` | 관리자: 공고·구직 관리, 지역 추가·삭제, 요금·기간 설정 |
+
+## 운영 규칙 (관리자 화면에서 바꿀 수 있음)
+
+- 기관마다 **첫 공고 7일 무료**, 그다음 공고와 연장은 결제 (기본 30일 30,000원 — 임시 금액이니 꼭 정해서 바꿔 주세요)
+- 무료 이벤트를 켜면 모든 공고가 결제 없이 올라감
+- 요양보호사 연락처는 로그인한 기관에게만 보임, 이름은 김○순처럼 가림
+- 구직 글은 60일간 노출
+
+## Vercel 설정 (처음 한 번)
+
+1. **데이터 저장소 연결**: Vercel 프로젝트 → Storage → Create Database → **Upstash for Redis** (무료 플랜) → 이 프로젝트에 연결
+   - 연결하면 `KV_REST_API_URL`, `KV_REST_API_TOKEN` 환경변수가 자동으로 들어갑니다.
+2. **관리자 비밀번호**: Settings → Environment Variables → `ADMIN_PASSWORD` 추가 (남이 짐작 못 할 비밀번호)
+3. (권장) `SESSION_SECRET`: 아무 긴 문자열(30자 이상)
+4. 저장 후 Deployments → 맨 위 배포 → Redeploy
+
+## 결제 (토스페이먼츠)
+
+- 지금은 토스페이먼츠 공식 샘플 **테스트 키**로 동작합니다. 실제 돈은 빠져나가지 않습니다.
+- 가맹 심사가 끝나면 Vercel 환경변수에 아래 두 개를 넣고 Redeploy 하면 실제 결제로 바뀝니다.
+  - `NEXT_PUBLIC_TOSS_CLIENT_KEY` = live_ck_로 시작하는 클라이언트 키 (API 개별 연동 키)
+  - `TOSS_SECRET_KEY` = live_sk_로 시작하는 시크릿 키
+- 시크릿 키는 절대 코드나 채팅에 붙여넣지 마세요. Vercel 환경변수에만 넣으세요.
+
+## 내 컴퓨터에서 실행
+
+```
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+http://localhost:3000 에서 확인. 내 컴퓨터에서는 `.data/db.json`에 저장되고, 관리자 비밀번호는 `admin1234`입니다.
