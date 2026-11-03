@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { verifyPassword } from "@/lib/auth";
 import { deleteOne, getAll, putOne } from "@/lib/db";
-import { addDays, daysLeft, fail, getSettings, handle, onlyDigits } from "@/lib/data";
-import type { Seeker } from "@/lib/types";
+import { addDays, clean, daysLeft, fail, getSettings, handle, onlyDigits } from "@/lib/data";
+import { FACILITIES, REGIONS, type Facility, type Region, type Seeker } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-// 요양보호사가 휴대폰 번호 + 비밀번호 4자리로 내 구직 글을 관리
+// 요양보호사가 휴대폰 번호 + 비밀번호 4자리로 내 구직 글을 관리 (불러오기·수정·마감·다시 올리기·삭제)
 export async function POST(req: Request) {
   return handle(async () => {
     const b = await req.json();
@@ -22,6 +22,29 @@ export async function POST(req: Request) {
     const target = b.id ? mine.find((s) => s.id === b.id) : null;
     if (b.action && !target) return fail("해당 글을 찾을 수 없습니다.", 404);
 
+    if (b.action === "update" && target) {
+      const name = clean(b.name, 20);
+      const region = b.region as Region;
+      const area = clean(b.area, 40);
+      const facilities = (Array.isArray(b.facilities) ? b.facilities : []).filter((f: string) =>
+        FACILITIES.some((x) => x.key === f),
+      ) as Facility[];
+      if (!name) return fail("이름을 입력해 주세요.");
+      if (!REGIONS.includes(region) || !area) return fail("희망 근무 지역을 선택해 주세요.");
+      if (facilities.length === 0) return fail("희망 근무 형태를 하나 이상 골라 주세요.");
+      // 휴대폰 번호와 비밀번호, 노출 기간은 그대로 둡니다
+      await putOne("seekers", {
+        ...target,
+        name,
+        region,
+        area,
+        facilities,
+        hasLicense: Boolean(b.hasLicense),
+        experience: clean(b.experience, 60),
+        availableTime: clean(b.availableTime, 80),
+        memo: clean(b.memo, 200),
+      });
+    }
     if (b.action === "close" && target) await putOne("seekers", { ...target, status: "closed" });
     if (b.action === "reopen" && target) {
       const settings = await getSettings();
@@ -31,13 +54,22 @@ export async function POST(req: Request) {
 
     const fresh = (await getAll<Seeker>("seekers")).filter((s) => mine.some((m) => m.id === s.id));
     return NextResponse.json({
-      posts: fresh.map((s) => ({
-        id: s.id,
-        area: `${s.region} ${s.area}`,
-        createdAt: s.createdAt,
-        live: s.status === "active" && daysLeft(s.expiresAt) > 0,
-        daysLeft: s.status === "active" ? daysLeft(s.expiresAt) : 0,
-      })),
+      posts: fresh
+        .sort((a, c) => c.createdAt.localeCompare(a.createdAt))
+        .map((s) => ({
+          id: s.id,
+          name: s.name,
+          region: s.region,
+          area: s.area,
+          facilities: s.facilities,
+          hasLicense: s.hasLicense,
+          experience: s.experience,
+          availableTime: s.availableTime,
+          memo: s.memo,
+          createdAt: s.createdAt,
+          live: s.status === "active" && daysLeft(s.expiresAt) > 0,
+          daysLeft: s.status === "active" ? daysLeft(s.expiresAt) : 0,
+        })),
     });
   });
 }

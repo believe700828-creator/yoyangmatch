@@ -166,7 +166,12 @@ function OrgDashboard() {
                         등록 {shortDate(j.createdAt)}{j.expiresAt ? ` · 노출 종료 ${shortDate(j.expiresAt)}` : ""}
                       </p>
                       {!closed && (
-                        <div className="mt-3 grid grid-cols-2 gap-2">
+                        <Link href={`/jobs/${j.id}/edit`} className="btn-ghost mt-3 w-full">
+                          내용 수정
+                        </Link>
+                      )}
+                      {!closed && (
+                        <div className="mt-2 grid grid-cols-2 gap-2">
                           <button className={pending ? "btn-sun" : "btn-ghost"} disabled={busyId === j.id} onClick={() => pay(j.id)}>
                             {busyId === j.id ? "여는 중…" : pending ? "결제하고 노출" : `${me.settings.paidDays}일 연장`}
                           </button>

@@ -115,9 +115,14 @@ function Board() {
               <p className="text-[0.97rem] text-pine-deep">
                 <b>요양보호사님이신가요?</b> 가입 없이 1분이면 구직 등록이 끝나요. 연락처는 기관 회원에게만 보여요.
               </p>
-              <Link href="/seekers/new" className="btn-primary shrink-0">
-                구직 등록하기
-              </Link>
+              <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                <Link href="/seekers/new" className="btn-primary">
+                  구직 등록하기
+                </Link>
+                <Link href="/seekers/manage" className="text-center text-sm font-semibold text-pine underline underline-offset-2">
+                  이미 등록했어요 (수정·마감)
+                </Link>
+              </div>
             </>
           )}
         </div>
