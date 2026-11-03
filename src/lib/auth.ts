@@ -74,9 +74,10 @@ export function adminPasswordConfigured(): boolean {
 
 export function checkAdminPassword(pw: string): boolean {
   // 내 컴퓨터 테스트용 기본 비밀번호: admin1234 (실제 사이트에서는 ADMIN_PASSWORD 환경변수 필수)
-  const real = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV !== "production" ? "admin1234" : "");
+  // 앞뒤 공백은 무시 (복사·붙여넣기할 때 공백이 섞여 들어가는 경우가 많음)
+  const real = (process.env.ADMIN_PASSWORD || (process.env.NODE_ENV !== "production" ? "admin1234" : "")).trim();
   if (!real) return false;
-  const a = Buffer.from(pw);
+  const a = Buffer.from(pw.trim());
   const b = Buffer.from(real);
   return a.length === b.length && timingSafeEqual(a, b);
 }
