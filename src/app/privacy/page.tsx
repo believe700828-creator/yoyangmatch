@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { BackLink, PageBody, SiteFooter, SiteHeader } from "@/components/Shell";
+import { CONTACT_EMAIL, CONTACT_PHONE, OPERATOR } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "개인정보 처리방침 | 요양매칭",
   description: "요양매칭(yoyangmatch.com) 개인정보 처리방침",
 };
 
-// 운영 정보: 바뀌면 여기만 고치고 시행일을 새 날짜로 바꾸세요
-const OPERATOR = "서연컴퍼니";
+// 운영자·연락처는 src/lib/site.ts 에서 바꿉니다. 내용이 바뀌면 시행일도 새 날짜로 바꾸세요
 const OFFICER = "요양매칭 운영팀";
-const PHONE = "0504-007-8909";
-const EMAIL = "believe700828@gmail.com";
+const PHONE = CONTACT_PHONE;
+const EMAIL = CONTACT_EMAIL;
 const EFFECTIVE = "2026년 11월 3일";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -125,6 +125,7 @@ export default function PrivacyPage() {
           <p>이용자는 언제든지 자신의 개인정보 열람, 정정, 삭제, 처리 정지를 요구할 수 있습니다.</p>
           <ul className="list-disc space-y-1 pl-5">
             <li>요양보호사: 사이트 하단 &lsquo;내 구직 글 관리&rsquo;에서 직접 마감·삭제</li>
+            <li>비밀번호를 잊은 경우: 아래 연락처로 문의하시면 등록된 전화번호로 본인 확인 후 임시 비밀번호를 발급합니다.</li>
             <li>그 밖의 요청: 아래 개인정보 보호책임자 연락처로 요청하시면 지체 없이 처리합니다.</li>
           </ul>
         </Section>

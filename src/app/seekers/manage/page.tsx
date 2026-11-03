@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AreaPicker, FacilityChips, facilityDot } from "@/components/Pickers";
 import { BackLink, Notice, PageBody, SiteHeader } from "@/components/Shell";
 import { api, formatPhoneInput, shortDate, useMeta } from "@/lib/client";
+import { CONTACT_PHONE, telHref } from "@/lib/site";
 import { facilityLabel, type Facility, type Location, type Region } from "@/lib/types";
 
 interface Post {
@@ -77,6 +78,9 @@ export default function ManageSeekerPage() {
             <input id="m-pw" className="field max-w-40 tracking-[0.4em]" type="password" inputMode="numeric" maxLength={4} value={password} onChange={(e) => setPassword(e.target.value.replace(/\D/g, ""))} required />
           </div>
           {!posts && error && <Notice tone="error">{error}</Notice>}
+          <p className="text-sm text-muted">
+            비밀번호를 잊으셨나요? <a href={telHref} className="font-semibold text-pine underline underline-offset-2">{CONTACT_PHONE}</a>로 연락 주시면 본인 확인 후 새 번호를 알려드려요.
+          </p>
           <button className="btn-primary w-full" disabled={busy}>{busy && !posts ? "확인 중…" : "내 글 불러오기"}</button>
         </form>
 

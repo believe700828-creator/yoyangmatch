@@ -74,7 +74,10 @@ export default function AdminPage() {
     setOk("");
     try {
       const res = await api<Record<string, unknown>>(url, body, method);
-      if (okMsg) setOk(typeof okMsg === "function" ? okMsg(res) : okMsg);
+      if (okMsg) {
+        setOk(typeof okMsg === "function" ? okMsg(res) : okMsg);
+        setTimeout(() => document.getElementById("admin-msg")?.scrollIntoView({ block: "center", behavior: "smooth" }), 50);
+      }
       load();
       return true;
     } catch (e) {
@@ -164,7 +167,7 @@ export default function AdminPage() {
         </div>
 
         <div className="mt-4 space-y-3">
-          {ok && <Notice tone="ok">{ok}</Notice>}
+          {ok && <div id="admin-msg"><Notice tone="ok">{ok}</Notice></div>}
           {error && <Notice tone="error">{error}</Notice>}
         </div>
 
@@ -215,6 +218,16 @@ export default function AdminPage() {
                     <button className="btn-ghost px-3 py-1.5 text-sm" disabled={busy} onClick={() => run("/api/admin/seekers", { id: s.id, action: "hide" }, undefined, "숨겼어요.")}>숨기기</button>
                   )}
                   <button className="btn-ghost px-3 py-1.5 text-sm text-alert" disabled={busy} onClick={() => confirm("이 구직 글을 완전히 지울까요?") && run("/api/admin/seekers", { id: s.id, action: "delete" }, undefined, "삭제했어요.")}>삭제</button>
+                  <button
+                    className="btn-ghost px-3 py-1.5 text-sm"
+                    disabled={busy}
+                    onClick={() =>
+                      confirm(`${s.name}님(${s.phone})에게 등록된 번호로 전화해 본인 확인을 하셨나요?\n확인을 누르면 새 비밀번호 4자리를 만들어요.`) &&
+                      run("/api/admin/reset", { kind: "seeker", id: s.id }, undefined, (r) => `${r.who}님 새 비밀번호: ${r.temp} — 본인에게 알려주세요. (이 번호로 등록한 글 ${r.count}개 모두 적용)`)
+                    }
+                  >
+                    비밀번호 재설정
+                  </button>
                 </div>
               </li>
             ))}
@@ -233,6 +246,16 @@ export default function AdminPage() {
                   <li key={o.id} className="px-3 py-2.5 text-[0.95rem]">
                     <b>{o.name}</b> <span className="text-muted">{facilityLabel(o.facility)}</span>
                     <div className="text-sm text-muted">{o.phone} · 가입 {shortDate(o.createdAt)} · 무료공고 {o.freeUsed ? "사용함" : "남음"}</div>
+                    <button
+                      className="btn-ghost mt-1.5 px-3 py-1 text-sm"
+                      disabled={busy}
+                      onClick={() =>
+                        confirm(`${o.name}(${o.phone})에 등록된 번호로 전화해 본인 확인을 하셨나요?\n확인을 누르면 임시 비밀번호를 만들어요.`) &&
+                        run("/api/admin/reset", { kind: "org", id: o.id }, undefined, (r) => `${r.who} 임시 비밀번호: ${r.temp} — 기관에 알려주고, 로그인 후 '비밀번호 변경'에서 바꾸도록 안내해 주세요.`)
+                      }
+                    >
+                      임시 비밀번호 발급
+                    </button>
                   </li>
                 ))}
               </ul>
