@@ -42,7 +42,6 @@ export function SiteFooter() {
           <Link href="/privacy" className="font-bold text-ink underline underline-offset-2">개인정보 처리방침</Link>
           <Link href="/seekers/manage" className="underline underline-offset-2">내 구직 글 관리</Link>
           <Link href="/org" className="underline underline-offset-2">기관 페이지</Link>
-          <Link href="/admin" className="underline underline-offset-2">관리자</Link>
         </p>
       </div>
     </footer>
