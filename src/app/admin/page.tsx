@@ -68,16 +68,18 @@ export default function AdminPage() {
     load();
   }, [load]);
 
-  async function run(url: string, body: unknown, method?: string, okMsg?: string) {
+  async function run(url: string, body: unknown, method?: string, okMsg?: OkMsg): Promise<boolean> {
     setBusy(true);
     setError("");
     setOk("");
     try {
-      await api(url, body, method);
-      if (okMsg) setOk(okMsg);
+      const res = await api<Record<string, unknown>>(url, body, method);
+      if (okMsg) setOk(typeof okMsg === "function" ? okMsg(res) : okMsg);
       load();
+      return true;
     } catch (e) {
       setError((e as Error).message);
+      return false;
     } finally {
       setBusy(false);
     }
@@ -288,25 +290,47 @@ function EmptyRow({ text }: { text: string }) {
   return <li className="rounded-xl border border-dashed border-line bg-white p-6 text-center text-muted">{text}</li>;
 }
 
-type Run = (url: string, body: unknown, method?: string, okMsg?: string) => Promise<void>;
+type OkMsg = string | ((res: Record<string, unknown>) => string);
+type Run = (url: string, body: unknown, method?: string, okMsg?: OkMsg) => Promise<boolean>;
 
 function LocationsPanel({ locations, busy, run }: { locations: Location[]; busy: boolean; run: Run }) {
   const [region, setRegion] = useState<Region>("경기");
-  const [name, setName] = useState("");
+  const [text, setText] = useState("");
+  const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
   return (
     <div className="mt-3 space-y-5">
       <form
-        className="flex flex-wrap gap-2 rounded-xl border border-line bg-white p-3"
-        onSubmit={(e) => {
+        className="space-y-3 rounded-xl border border-line bg-white p-4"
+        onSubmit={async (e) => {
           e.preventDefault();
-          run("/api/admin/locations", { region, name }, undefined, `${region} ${name} 지역을 추가했어요.`).then(() => setName(""));
+          const done = await run("/api/admin/locations", { region, names: lines }, undefined, (res) => {
+            const added = (res.added as string[]) ?? [];
+            const skipped = (res.skipped as string[]) ?? [];
+            return `${added.length}곳을 추가했어요.` + (skipped.length ? ` 이미 있던 ${skipped.length}곳(${skipped.join(", ")})은 건너뛰었어요.` : "");
+          });
+          if (done) setText("");
         }}
       >
-        <select className="field w-28" value={region} onChange={(e) => setRegion(e.target.value as Region)} aria-label="시·도">
-          {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
-        </select>
-        <input className="field min-w-40 flex-1" value={name} onChange={(e) => setName(e.target.value)} placeholder="예: 수원시 영통구" aria-label="지역 이름" required />
-        <button className="btn-primary" disabled={busy}>지역 추가</button>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="field-label mb-0">기본 시·도</span>
+          <select className="field w-28" value={region} onChange={(e) => setRegion(e.target.value as Region)} aria-label="기본 시·도">
+            {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </div>
+        <textarea
+          className="field min-h-36 font-[inherit]"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={"한 줄에 하나씩 적거나 붙여넣으세요\n수원시 장안구\n수원시 권선구\n수원시 팔달구\n수원시 영통구"}
+          aria-label="추가할 지역 (한 줄에 하나씩)"
+          required
+        />
+        <p className="text-sm text-muted">
+          줄 앞에 &ldquo;서울&rdquo; 또는 &ldquo;경기&rdquo;를 붙이면 그 시·도로 들어가요. 예: <b>서울 강남구</b>. 이미 있는 지역은 자동으로 건너뛰어요.
+        </p>
+        <button className="btn-primary w-full sm:w-auto" disabled={busy || lines.length === 0}>
+          {lines.length > 1 ? `${lines.length}곳 한꺼번에 추가` : "지역 추가"}
+        </button>
       </form>
       {REGIONS.map((r) => (
         <section key={r}>
