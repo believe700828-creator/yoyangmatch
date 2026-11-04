@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { notifyNewJob } from "@/lib/alimtalk";
 import { getOrgId } from "@/lib/auth";
 import { getAll, getOne, putOne } from "@/lib/db";
 import { addDays, fail, getSettings, handle, isLive, newId, toPublicJob } from "@/lib/data";
@@ -43,6 +44,7 @@ export async function POST(req: Request) {
     };
     await putOne("jobs", job);
     if (free && !settings.freeForAll && !org.freeUsed) await putOne("orgs", { ...org, freeUsed: true });
+    if (free && isVerified(org)) await notifyNewJob(job.id); // 지역 구인 알림 (알림톡)
     return NextResponse.json({ job, needsPayment: !free, pendingReview: !isVerified(org) }, { status: 201 });
   });
 }

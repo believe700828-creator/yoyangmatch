@@ -61,6 +61,7 @@ export async function POST(req: Request) {
       status: "active",
       createdAt: new Date().toISOString(),
       expiresAt: addDays(settings.seekerDays),
+      ...(b.alertOn ? { alertOn: true, alertAgreedAt: new Date().toISOString() } : {}),
     };
     await putOne("seekers", seeker);
     return NextResponse.json({ ok: true, id: seeker.id }, { status: 201 });

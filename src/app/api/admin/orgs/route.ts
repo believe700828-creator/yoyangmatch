@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { notifyNewJob } from "@/lib/alimtalk";
 import { isAdmin } from "@/lib/auth";
 import { getAll, getOne, putOne } from "@/lib/db";
 import { fail, handle } from "@/lib/data";
@@ -17,9 +18,9 @@ export async function POST(req: Request) {
     if (action === "approve") {
       await putOne("orgs", { ...org, verified: true });
       // 확인을 기다리는 동안 노출 기간이 줄지 않도록, 지금부터 원래 기간만큼 다시 계산
+      const jobs = (await getAll<Job>("jobs")).filter((j) => j.orgId === org.id && j.status === "active" && j.expiresAt);
       if (org.verified === false) {
         const now = Date.now();
-        const jobs = (await getAll<Job>("jobs")).filter((j) => j.orgId === org.id && j.status === "active" && j.expiresAt);
         await Promise.all(
           jobs.map((j) => {
             const span = new Date(j.expiresAt!).getTime() - new Date(j.createdAt).getTime();
@@ -27,6 +28,8 @@ export async function POST(req: Request) {
           }),
         );
       }
+      // 승인으로 공개된 공고의 지역 알림
+      for (const j of jobs) await notifyNewJob(j.id);
       return NextResponse.json({ ok: true });
     }
     if (action === "unapprove") {

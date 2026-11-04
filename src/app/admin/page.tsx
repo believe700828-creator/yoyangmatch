@@ -34,7 +34,7 @@ interface AdminData {
   seekers: AdminSeeker[];
   orgs: AdminOrg[];
   orders: Order[];
-  system: { storeConnected: boolean; paymentTestMode: boolean };
+  system: { storeConnected: boolean; paymentTestMode: boolean; alimtalkReady: boolean; alertSubscribers: number };
 }
 
 const TABS = [
@@ -142,6 +142,14 @@ export default function AdminPage() {
           {!data.system.storeConnected && (
             <Notice tone="error">데이터 저장소(Upstash Redis)가 연결되지 않았어요. 지금은 테스트용 임시 저장소를 쓰고 있어요.</Notice>
           )}
+          {!data.system.alimtalkReady && (
+            <Notice>
+              카카오 알림톡이 아직 <b>설정 전</b>이에요. 알림 신청자 {data.system.alertSubscribers}명에게는 설정이 끝난 뒤 올라오는 공고부터 알림이 가요.
+            </Notice>
+          )}
+          {data.system.alimtalkReady && (
+            <Notice tone="ok">카카오 알림톡 켜짐 · 알림 신청자 {data.system.alertSubscribers}명</Notice>
+          )}
           {data.system.paymentTestMode && (
             <Notice>결제가 <b>테스트 모드</b>예요. 실제 돈은 빠져나가지 않아요. 토스페이먼츠 가맹 후 실제 키로 바꿔 주세요.</Notice>
           )}
@@ -185,6 +193,7 @@ export default function AdminPage() {
                 </div>
                 <p className="mt-1 text-[0.95rem]">{j.payType} {won(j.payAmount)} · {j.schedule} · {j.phone}</p>
                 <p className="text-sm text-muted">주소: {j.address || "없음 (주소 입력 전 공고)"}</p>
+                {j.alertedAt && <p className="text-sm text-muted">지역 알림 {j.alertCount ?? 0}명에게 발송 ({shortDate(j.alertedAt)})</p>}
                 <p className="text-sm text-muted">등록 {shortDate(j.createdAt)} · 종료 {shortDate(j.expiresAt)}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <button className="btn-ghost px-3 py-1.5 text-sm" disabled={busy} onClick={() => run("/api/admin/jobs", { id: j.id, action: "extend", days: 7 }, undefined, "7일 연장했어요.")}>7일 연장</button>

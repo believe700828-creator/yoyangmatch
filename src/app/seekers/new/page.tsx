@@ -20,6 +20,7 @@ export default function NewSeekerPage() {
   const [availableTime, setAvailableTime] = useState("");
   const [memo, setMemo] = useState("");
   const [agree, setAgree] = useState(false);
+  const [alertOn, setAlertOn] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
@@ -29,7 +30,7 @@ export default function NewSeekerPage() {
     setError("");
     setBusy(true);
     try {
-      await api("/api/seekers", { name, phone, password, region, area, facilities, hasLicense, experience, availableTime, memo, agree });
+      await api("/api/seekers", { name, phone, password, region, area, facilities, hasLicense, experience, availableTime, memo, agree, alertOn });
       setDone(true);
       window.scrollTo({ top: 0 });
     } catch (err) {
@@ -111,6 +112,17 @@ export default function NewSeekerPage() {
               <input id="sk-pw" className="field max-w-40 tracking-[0.4em]" type="password" inputMode="numeric" maxLength={4} value={password} onChange={(e) => setPassword(e.target.value.replace(/\D/g, ""))} required />
               <p className="mt-1 text-sm text-muted">나중에 글을 마감하거나 지울 때 써요.</p>
             </div>
+
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-pine/30 bg-sage p-4">
+              <input type="checkbox" className="mt-1 h-5 w-5 shrink-0 accent-[#1e5245]" checked={alertOn} onChange={(e) => setAlertOn(e.target.checked)} />
+              <span className="text-[0.95rem]">
+                <b>희망 지역에 새 공고가 올라오면 카카오톡으로 알려 주세요</b> <span className="text-muted">(선택)</span>
+                <span className="mt-1 block text-sm text-muted">
+                  희망 지역·근무 형태가 맞는 공고가 올라오면 카카오 알림톡으로 보내 드려요. 하루 최대 5건이고, 언제든 &lsquo;내 구직 글 관리&rsquo;에서
+                  끌 수 있어요. 발송을 위해 휴대폰 번호가 발송 대행사(솔라피)와 카카오에 전달돼요.
+                </span>
+              </span>
+            </label>
 
             <div className="rounded-xl border border-line bg-white p-4 text-[0.92rem]">
               <p className="font-semibold">개인정보 수집·이용 안내</p>

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const OFFICER = "요양매칭 운영팀";
 const PHONE = CONTACT_PHONE;
 const EMAIL = CONTACT_EMAIL;
-const EFFECTIVE = "2026년 11월 3일";
+const EFFECTIVE = "2026년 11월 4일";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -65,6 +65,7 @@ export default function PrivacyPage() {
             <li>요양기관 회원 가입, 로그인, 구인공고 등록·관리</li>
             <li>유료 공고 결제, 결제 확인 및 환불 처리</li>
             <li>허위 공고·부정 이용 방지, 문의 응대</li>
+            <li>지역 구인 알림을 신청한 요양보호사에게 새 구인공고 안내(카카오 알림톡)</li>
           </ul>
         </Section>
 
@@ -73,6 +74,7 @@ export default function PrivacyPage() {
             head={["구분", "항목"]}
             rows={[
               ["요양보호사(구직 등록)", "필수: 이름, 휴대폰 번호, 희망 근무 지역, 희망 근무 형태, 자격증 보유 여부, 관리용 비밀번호(암호화 저장)\n선택: 경력, 가능한 시간, 하고 싶은 말"],
+              ["지역 구인 알림 신청자(선택)", "휴대폰 번호, 이름, 희망 지역·근무 형태, 알림 신청 일시, 알림 발송 기록"],
               ["요양기관(회원)", "기관명, 기관 유형, 기관 전화번호(아이디), 비밀번호(암호화 저장), 구인공고 내용(문의 전화번호 포함)"],
               ["결제", "주문번호, 결제 금액, 결제 수단 종류, 결제 일시 (카드번호 등 결제 정보는 회사가 저장하지 않고 결제대행사가 처리)"],
               ["자동 수집", "로그인 유지를 위한 쿠키, 서비스 이용 과정에서 생성되는 접속 기록(IP 주소, 접속 일시 등)"],
@@ -109,6 +111,8 @@ export default function PrivacyPage() {
               ["Vercel Inc.", "웹사이트 호스팅 및 운영", "미국"],
               ["Upstash Inc.", "사이트 데이터 저장(데이터베이스)", "미국"],
               ["(주)토스페이먼츠", "유료 공고 결제 처리", "대한민국"],
+              ["솔라피", "카카오 알림톡 발송 대행 (알림 신청자만)", "대한민국"],
+              ["(주)카카오", "카카오 알림톡 전달 (알림 신청자만)", "대한민국"],
             ]}
           />
           <p className="text-[0.92rem] text-muted">
@@ -124,7 +128,7 @@ export default function PrivacyPage() {
         <Section title="7. 이용자의 권리와 행사 방법">
           <p>이용자는 언제든지 자신의 개인정보 열람, 정정, 삭제, 처리 정지를 요구할 수 있습니다.</p>
           <ul className="list-disc space-y-1 pl-5">
-            <li>요양보호사: 사이트 하단 &lsquo;내 구직 글 관리&rsquo;에서 직접 마감·삭제</li>
+            <li>요양보호사: 사이트 하단 &lsquo;내 구직 글 관리&rsquo;에서 직접 마감·삭제, 지역 구인 알림 켜기·끄기</li>
             <li>비밀번호를 잊은 경우: 아래 연락처로 문의하시면 등록된 전화번호로 본인 확인 후 임시 비밀번호를 발급합니다.</li>
             <li>그 밖의 요청: 아래 개인정보 보호책임자 연락처로 요청하시면 지체 없이 처리합니다.</li>
           </ul>
