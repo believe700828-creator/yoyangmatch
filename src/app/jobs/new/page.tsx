@@ -69,7 +69,7 @@ export default function NewJobPage() {
               facility: [meta.org.facility],
               region: "",
               area: "",
-              address: "",
+              address: meta.org.address,
               payType: "시급",
               payAmount: "",
               schedule: "",

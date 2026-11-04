@@ -37,6 +37,7 @@ export async function GET() {
         freeUsed: o.freeUsed,
         createdAt: o.createdAt,
         certNo: o.certNo ?? "",
+        address: o.address ?? "",
         verified: isVerified(o),
       })),
       orders: orders.filter((o) => o.status === "paid").sort((a, b) => (b.paidAt ?? "").localeCompare(a.paidAt ?? "")),

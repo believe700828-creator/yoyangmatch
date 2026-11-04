@@ -14,6 +14,7 @@ export function OrgAuth({ onDone, intro }: { onDone: () => void; intro?: string 
   const [password, setPassword] = useState("");
   const [facility, setFacility] = useState<Facility[]>([]);
   const [certNo, setCertNo] = useState("");
+  const [address, setAddress] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -23,7 +24,7 @@ export function OrgAuth({ onDone, intro }: { onDone: () => void; intro?: string 
     setError("");
     try {
       if (mode === "login") await api("/api/org/login", { phone, password });
-      else await api("/api/org/signup", { name, phone, password, facility: facility[0], certNo });
+      else await api("/api/org/signup", { name, phone, password, facility: facility[0], certNo, address });
       onDone();
     } catch (err) {
       setError((err as Error).message);
@@ -74,6 +75,20 @@ export function OrgAuth({ onDone, intro }: { onDone: () => void; intro?: string 
                 required
               />
               <p className="mt-1 text-sm text-muted">실제 운영 중인 기관인지 확인하는 데만 써요. 확인이 끝나면 공고가 공개돼요.</p>
+            </div>
+            <div>
+              <label className="field-label" htmlFor="org-address">기관 주소</label>
+              <input
+                id="org-address"
+                className="field"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="예: 용인시 기흥구 ○○로 12, 3층"
+                autoComplete="street-address"
+                maxLength={80}
+                required
+              />
+              <p className="mt-1 text-sm text-muted">공고를 올릴 때 자동으로 채워져요.</p>
             </div>
           </>
         )}

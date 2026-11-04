@@ -3,7 +3,7 @@ import { getOrgId } from "@/lib/auth";
 import { deleteOne, getOne, putOne } from "@/lib/db";
 import { fail, getSettings, handle } from "@/lib/data";
 import { parseJobInput } from "@/lib/jobInput";
-import type { Job } from "@/lib/types";
+import type { Job, Org } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +22,9 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
       const parsed = parseJobInput(body, (await getSettings()).minWage);
       if ("error" in parsed) return fail(parsed.error);
       await putOne("jobs", { ...job, ...parsed.fields });
+      // 예전에 가입해 주소가 없는 기관은 이번 주소를 기관 정보에도 저장 (다음 공고부터 자동 입력)
+      const org = await getOne<Org>("orgs", orgId);
+      if (org && !org.address && parsed.fields.address) await putOne("orgs", { ...org, address: parsed.fields.address });
       return NextResponse.json({ ok: true });
     }
     if (action === "close") {

@@ -42,7 +42,10 @@ export async function POST(req: Request) {
       expiresAt: free ? addDays(settings.freeForAll ? settings.paidDays : settings.freeDays) : null,
     };
     await putOne("jobs", job);
-    if (free && !settings.freeForAll && !org.freeUsed) await putOne("orgs", { ...org, freeUsed: true });
+    const orgPatch: Partial<Org> = {};
+    if (free && !settings.freeForAll && !org.freeUsed) orgPatch.freeUsed = true;
+    if (!org.address && parsed.fields.address) orgPatch.address = parsed.fields.address; // 다음 공고부터 자동 입력
+    if (Object.keys(orgPatch).length) await putOne("orgs", { ...org, ...orgPatch });
     return NextResponse.json({ job, needsPayment: !free, pendingReview: !isVerified(org) }, { status: 201 });
   });
 }

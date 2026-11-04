@@ -14,11 +14,13 @@ export async function POST(req: Request) {
     const password = String(b.password ?? "");
     const facility = b.facility as Facility;
     const certNo = onlyDigits(b.certNo);
+    const address = clean(b.address, 80);
 
     if (!name) return fail("기관명을 입력해 주세요.");
     if (phone.length < 9) return fail("전화번호를 정확히 입력해 주세요.");
     if (password.length < 6) return fail("비밀번호는 6자리 이상으로 정해 주세요.");
     if (!FACILITIES.some((f) => f.key === facility)) return fail("기관 유형을 선택해 주세요.");
+    if (address.length < 5) return fail("기관 주소를 입력해 주세요. (예: 용인시 기흥구 ○○로 12)");
     if (certNo.length !== 10 && certNo.length !== 11) {
       return fail("사업자등록번호(10자리) 또는 장기요양기관기호(11자리)를 정확히 입력해 주세요.");
     }
@@ -35,6 +37,7 @@ export async function POST(req: Request) {
       freeUsed: false,
       createdAt: new Date().toISOString(),
       certNo,
+      address,
       verified: false, // 관리자가 확인하면 공고가 공개되고 요양보호사 연락처를 볼 수 있음
     };
     await putOne("orgs", org);

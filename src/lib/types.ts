@@ -42,6 +42,7 @@ export interface Org {
   freeUsed: boolean;
   createdAt: string;
   certNo?: string; // 사업자등록번호 또는 장기요양기관기호 (숫자만)
+  address?: string; // 기관 주소 (공고 등록 시 자동으로 채움)
   verified?: boolean; // 관리자 확인 여부. 값이 없으면(예전 가입 기관) 확인된 것으로 봄
 }
 

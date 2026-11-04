@@ -24,7 +24,14 @@ export async function GET() {
         bizNo: settings.bizNo,
       },
       org: org
-        ? { id: org.id, name: org.name, facility: org.facility, freeUsed: org.freeUsed, verified: isVerified(org) }
+        ? {
+            id: org.id,
+            name: org.name,
+            facility: org.facility,
+            freeUsed: org.freeUsed,
+            verified: isVerified(org),
+            address: org.address ?? "",
+          }
         : null,
     });
   });

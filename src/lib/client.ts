@@ -27,7 +27,7 @@ export interface Meta {
     jobInfoRegNo: string;
     bizNo: string;
   };
-  org: { id: string; name: string; facility: Facility; freeUsed: boolean; verified: boolean } | null;
+  org: { id: string; name: string; facility: Facility; freeUsed: boolean; verified: boolean; address: string } | null;
 }
 
 export function useMeta() {

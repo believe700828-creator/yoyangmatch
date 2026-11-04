@@ -25,6 +25,7 @@ interface AdminOrg {
   freeUsed: boolean;
   createdAt: string;
   certNo: string;
+  address: string;
   verified: boolean;
 }
 interface AdminData {
@@ -257,6 +258,7 @@ export default function AdminPage() {
                     <div className="text-sm">
                       사업자·기관기호: <b>{o.certNo || "입력 안 함 (예전 가입)"}</b>
                     </div>
+                    <div className="text-sm text-muted">주소: {o.address || "없음"}</div>
                     <div className="mt-1.5 flex flex-wrap gap-2">
                     {o.verified ? (
                       <button
