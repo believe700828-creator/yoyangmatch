@@ -177,12 +177,18 @@ function Board() {
             <>
               {!canSeeContact && (
                 <div className="mb-3">
-                  <Notice>
-                    요양보호사 연락처는 <b>기관 회원</b>에게만 보여요.{" "}
-                    <Link href="/org" className="font-bold underline underline-offset-2">
-                      기관 로그인
-                    </Link>
-                  </Notice>
+                  {meta?.org ? (
+                    <Notice>
+                      관리자가 기관 확인을 마치면 요양보호사 연락처가 보여요.
+                    </Notice>
+                  ) : (
+                    <Notice>
+                      요양보호사 연락처는 <b>확인된 기관 회원</b>에게만 보여요.{" "}
+                      <Link href="/org" className="font-bold underline underline-offset-2">
+                        기관 로그인
+                      </Link>
+                    </Notice>
+                  )}
                 </div>
               )}
               <ul className="grid gap-3 md:grid-cols-2">
@@ -233,6 +239,12 @@ function JobItem({ job }: { job: PublicJob }) {
           {won(job.payAmount)}
         </p>
         <dl className="grid grid-cols-[4.2rem_1fr] gap-x-2 gap-y-1 text-[0.95rem]">
+          {job.address && (
+            <>
+              <dt className="text-muted">주소</dt>
+              <dd>{job.address}</dd>
+            </>
+          )}
           <dt className="text-muted">근무</dt>
           <dd>{job.schedule}</dd>
           <dt className="text-muted">업무</dt>

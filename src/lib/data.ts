@@ -10,6 +10,9 @@ export const DEFAULT_SETTINGS: Settings = {
   price: 30000,
   freeForAll: false,
   seekerDays: 60,
+  minWage: 10320, // 2026년 최저임금
+  jobInfoRegNo: "",
+  bizNo: "",
   seeded: false,
 };
 

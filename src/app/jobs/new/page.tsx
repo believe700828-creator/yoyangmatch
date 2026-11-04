@@ -11,7 +11,7 @@ import { api, formatPhoneInput, useMeta, won } from "@/lib/client";
 export default function NewJobPage() {
   const router = useRouter();
   const { meta, error: metaError, reload } = useMeta();
-  const [done, setDone] = useState<null | { needsPayment: boolean; jobId: string }>(null);
+  const [done, setDone] = useState<null | { needsPayment: boolean; jobId: string; pendingReview: boolean }>(null);
 
   const s = meta?.settings;
   const isFree = s ? s.freeForAll || !meta?.org?.freeUsed : true;
@@ -48,20 +48,28 @@ export default function NewJobPage() {
                 </button>
               </>
             ) : (
-              <>
-                <Notice tone="ok">공고가 올라갔어요. 지금부터 목록에 보여요. 내용은 &lsquo;내 공고 관리&rsquo;에서 언제든 수정할 수 있어요.</Notice>
-                <Link href="/" className="btn-primary w-full">공고 목록 보기</Link>
-              </>
+              done.pendingReview ? (
+                <Notice>
+                  공고가 저장됐어요. <b>관리자가 기관 확인을 마치면 목록에 공개</b>돼요. 노출 기간은 공개되는 날부터 계산돼요.
+                </Notice>
+              ) : (
+                <>
+                  <Notice tone="ok">공고가 올라갔어요. 지금부터 목록에 보여요. 내용은 &lsquo;내 공고 관리&rsquo;에서 언제든 수정할 수 있어요.</Notice>
+                  <Link href="/" className="btn-primary w-full">공고 목록 보기</Link>
+                </>
+              )
             )}
             <Link href="/org" className="btn-ghost w-full">내 공고 관리</Link>
           </div>
         ) : (
           <JobForm
             locations={meta.locations}
+            minWage={meta.settings.minWage}
             initial={{
               facility: [meta.org.facility],
               region: "",
               area: "",
+              address: "",
               payType: "시급",
               payAmount: "",
               schedule: "",
@@ -74,6 +82,9 @@ export default function NewJobPage() {
                 <p className="text-[0.95rem] text-muted">
                   <b className="text-ink">{meta.org.name}</b> 이름으로 올라가요.
                 </p>
+                {!meta.org.verified && (
+                  <Notice>지금은 기관 확인을 기다리는 중이에요. 공고는 미리 올려 두시면 확인 후 바로 공개돼요.</Notice>
+                )}
                 {isFree ? (
                   <Notice tone="ok">
                     {s!.freeForAll ? `무료 이벤트 기간이라 ${s!.paidDays}일간 무료로 노출돼요.` : `첫 공고라서 ${s!.freeDays}일간 무료로 노출돼요.`}
@@ -87,8 +98,11 @@ export default function NewJobPage() {
             }
             submitLabel={isFree ? "공고 올리기" : "공고 저장하고 결제하기"}
             onSubmit={async (v) => {
-              const r = await api<{ job: { id: string }; needsPayment: boolean }>("/api/jobs", { ...v, facility: v.facility[0] });
-              setDone({ needsPayment: r.needsPayment, jobId: r.job.id });
+              const r = await api<{ job: { id: string }; needsPayment: boolean; pendingReview: boolean }>("/api/jobs", {
+                ...v,
+                facility: v.facility[0],
+              });
+              setDone({ needsPayment: r.needsPayment, jobId: r.job.id, pendingReview: r.pendingReview });
               window.scrollTo({ top: 0 });
             }}
           />

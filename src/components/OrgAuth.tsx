@@ -13,6 +13,7 @@ export function OrgAuth({ onDone, intro }: { onDone: () => void; intro?: string 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [facility, setFacility] = useState<Facility[]>([]);
+  const [certNo, setCertNo] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,7 +23,7 @@ export function OrgAuth({ onDone, intro }: { onDone: () => void; intro?: string 
     setError("");
     try {
       if (mode === "login") await api("/api/org/login", { phone, password });
-      else await api("/api/org/signup", { name, phone, password, facility: facility[0] });
+      else await api("/api/org/signup", { name, phone, password, facility: facility[0], certNo });
       onDone();
     } catch (err) {
       setError((err as Error).message);
@@ -60,6 +61,19 @@ export function OrgAuth({ onDone, intro }: { onDone: () => void; intro?: string 
             <div>
               <span className="field-label">기관 유형</span>
               <FacilityChips value={facility} onChange={setFacility} />
+            </div>
+            <div>
+              <label className="field-label" htmlFor="org-cert">사업자등록번호 또는 장기요양기관기호</label>
+              <input
+                id="org-cert"
+                className="field"
+                inputMode="numeric"
+                value={certNo}
+                onChange={(e) => setCertNo(e.target.value.replace(/[^\d-]/g, "").slice(0, 14))}
+                placeholder="숫자 10자리 또는 11자리"
+                required
+              />
+              <p className="mt-1 text-sm text-muted">실제 운영 중인 기관인지 확인하는 데만 써요. 확인이 끝나면 공고가 공개돼요.</p>
             </div>
           </>
         )}

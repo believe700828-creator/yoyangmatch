@@ -17,8 +17,17 @@ export async function api<T = Record<string, unknown>>(url: string, body?: unkno
 
 export interface Meta {
   locations: Location[];
-  settings: { freeDays: number; paidDays: number; price: number; freeForAll: boolean; seekerDays: number };
-  org: { id: string; name: string; facility: Facility; freeUsed: boolean } | null;
+  settings: {
+    freeDays: number;
+    paidDays: number;
+    price: number;
+    freeForAll: boolean;
+    seekerDays: number;
+    minWage: number;
+    jobInfoRegNo: string;
+    bizNo: string;
+  };
+  org: { id: string; name: string; facility: Facility; freeUsed: boolean; verified: boolean } | null;
 }
 
 export function useMeta() {

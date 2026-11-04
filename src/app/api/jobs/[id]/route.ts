@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getOrgId } from "@/lib/auth";
 import { deleteOne, getOne, putOne } from "@/lib/db";
-import { fail, handle } from "@/lib/data";
+import { fail, getSettings, handle } from "@/lib/data";
 import { parseJobInput } from "@/lib/jobInput";
 import type { Job } from "@/lib/types";
 
@@ -19,7 +19,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
     if (action === "update") {
       // 내용만 바꾸고, 노출 상태·기간·결제는 그대로 둡니다
       if (job.status === "hidden") return fail("관리자가 내린 공고는 수정할 수 없습니다. 문의해 주세요.", 403);
-      const parsed = parseJobInput(body);
+      const parsed = parseJobInput(body, (await getSettings()).minWage);
       if ("error" in parsed) return fail(parsed.error);
       await putOne("jobs", { ...job, ...parsed.fields });
       return NextResponse.json({ ok: true });

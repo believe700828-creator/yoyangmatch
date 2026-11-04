@@ -10,6 +10,7 @@ export interface JobFormValues {
   facility: Facility[];
   region: Region | "";
   area: string;
+  address: string;
   payType: PayType;
   payAmount: string; // 화면용: 쉼표 들어간 금액
   schedule: string;
@@ -23,12 +24,14 @@ export const toPayInput = (n: number) => (n ? n.toLocaleString("ko-KR") : "");
 // 구인공고 등록·수정에서 같이 쓰는 입력 화면
 export function JobForm({
   locations,
+  minWage,
   initial,
   intro,
   submitLabel,
   onSubmit,
 }: {
   locations: Location[];
+  minWage: number;
   initial: JobFormValues;
   intro?: React.ReactNode;
   submitLabel: string;
@@ -44,6 +47,11 @@ export function JobForm({
     setError("");
     if (!v.facility[0]) return setError("기관 유형을 선택해 주세요.");
     if (!v.region || !v.area) return setError("근무 지역을 선택해 주세요.");
+    if (v.address.trim().length < 5) return setError("기관 주소를 입력해 주세요.");
+    const pay = Number(v.payAmount.replace(/\D/g, ""));
+    if (v.payType === "시급" && minWage > 0 && pay < minWage) {
+      return setError(`시급은 최저임금(${minWage.toLocaleString("ko-KR")}원) 이상이어야 올릴 수 있어요.`);
+    }
     setBusy(true);
     try {
       await onSubmit(v);
@@ -81,6 +89,21 @@ export function JobForm({
       </div>
 
       <div>
+        <label className="field-label" htmlFor="job-address">기관 주소</label>
+        <input
+          id="job-address"
+          className="field"
+          value={v.address}
+          onChange={(e) => set("address", e.target.value)}
+          placeholder="예: 용인시 기흥구 ○○로 12, 3층"
+          autoComplete="street-address"
+          maxLength={80}
+          required
+        />
+        <p className="mt-1 text-sm text-muted">구인공고에는 기관 이름·주소·전화번호를 함께 적어야 해요.</p>
+      </div>
+
+      <div>
         <span className="field-label">급여</span>
         <div className="mb-2 flex flex-wrap gap-2" role="radiogroup" aria-label="급여 방식">
           {PAY_TYPES.map((p) => (
@@ -104,6 +127,11 @@ export function JobForm({
           />
           <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-muted">원</span>
         </div>
+        {minWage > 0 && (
+          <p className="mt-1 text-sm text-muted">
+            최저임금 시급 {minWage.toLocaleString("ko-KR")}원 이상으로 적어 주세요. 일급·월급도 근무시간으로 나눈 금액이 이보다 낮으면 안 돼요.
+          </p>
+        )}
       </div>
 
       <div>

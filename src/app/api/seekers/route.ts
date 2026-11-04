@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getOrgId, hashPassword } from "@/lib/auth";
 import { deleteOne, getAll, getOne, putOne } from "@/lib/db";
 import { addDays, clean, fail, getSettings, handle, newId, onlyDigits, toPublicSeeker } from "@/lib/data";
-import { FACILITIES, REGIONS, type Facility, type Org, type Region, type Seeker } from "@/lib/types";
+import { FACILITIES, REGIONS, isVerified, type Facility, type Org, type Region, type Seeker } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +10,9 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   return handle(async () => {
     const orgId = await getOrgId();
-    const org = orgId ? await getOne<Org>("orgs", orgId) : null;
+    const found = orgId ? await getOne<Org>("orgs", orgId) : null;
+    // 요양보호사 연락처는 관리자가 확인한 기관에게만 공개
+    const org = found && isVerified(found) ? found : null;
     const now = Date.now();
     const all = await getAll<Seeker>("seekers");
     // 개인정보 처리방침: 노출 기간이 끝나고 30일이 지난 구직 글은 자동 삭제

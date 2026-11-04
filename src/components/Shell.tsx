@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FooterRegInfo } from "@/components/FooterRegInfo";
 import { CONTACT_PHONE, OPERATOR } from "@/lib/site";
 
 export function SiteHeader({ right }: { right?: React.ReactNode }) {
@@ -38,6 +39,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-5xl space-y-1 px-4 py-6 text-sm text-muted">
         <p className="font-semibold text-ink">요양매칭 · yoyangmatch.com</p>
         <p>운영: {OPERATOR} · 문의 {CONTACT_PHONE}</p>
+        <FooterRegInfo />
         <p>방문요양·주야간보호·요양원과 요양보호사를 잇는 수도권 구인구직 서비스</p>
         <p className="flex flex-wrap gap-x-3 gap-y-1 pt-1">
           <Link href="/privacy" className="font-bold text-ink underline underline-offset-2">개인정보 처리방침</Link>

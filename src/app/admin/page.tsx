@@ -24,6 +24,8 @@ interface AdminOrg {
   facility: Facility;
   freeUsed: boolean;
   createdAt: string;
+  certNo: string;
+  verified: boolean;
 }
 interface AdminData {
   settings: Settings;
@@ -39,7 +41,7 @@ const TABS = [
   { key: "jobs", label: "구인공고" },
   { key: "seekers", label: "구직" },
   { key: "locations", label: "지역" },
-  { key: "orgs", label: "기관·결제" },
+  { key: "orgs", label: `기관·결제` },
   { key: "settings", label: "요금·기간" },
 ] as const;
 type TabKey = (typeof TABS)[number]["key"];
@@ -149,7 +151,7 @@ export default function AdminPage() {
           <Stat label="노출 중 공고" value={data.jobs.filter((j) => j.live).length} />
           <Stat label="결제 대기 공고" value={data.jobs.filter((j) => j.status === "pending_payment").length} />
           <Stat label="노출 중 구직" value={data.seekers.filter((s) => s.status === "active" && s.daysLeft > 0).length} />
-          <Stat label="가입 기관" value={data.orgs.length} />
+          <Stat label="확인 대기 기관" value={data.orgs.filter((o) => !o.verified).length} />
         </div>
 
         <div className="mt-5 flex gap-1 overflow-x-auto border-b border-line" role="tablist">
@@ -182,6 +184,7 @@ export default function AdminPage() {
                   <JobBadge j={j} />
                 </div>
                 <p className="mt-1 text-[0.95rem]">{j.payType} {won(j.payAmount)} · {j.schedule} · {j.phone}</p>
+                <p className="text-sm text-muted">주소: {j.address || "없음 (주소 입력 전 공고)"}</p>
                 <p className="text-sm text-muted">등록 {shortDate(j.createdAt)} · 종료 {shortDate(j.expiresAt)}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <button className="btn-ghost px-3 py-1.5 text-sm" disabled={busy} onClick={() => run("/api/admin/jobs", { id: j.id, action: "extend", days: 7 }, undefined, "7일 연장했어요.")}>7일 연장</button>
@@ -244,10 +247,42 @@ export default function AdminPage() {
                 {data.orgs.length === 0 && <li className="p-4 text-muted">아직 없어요.</li>}
                 {data.orgs.map((o) => (
                   <li key={o.id} className="px-3 py-2.5 text-[0.95rem]">
-                    <b>{o.name}</b> <span className="text-muted">{facilityLabel(o.facility)}</span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <b>{o.name}</b> <span className="text-muted">{facilityLabel(o.facility)}</span>
+                      <span className={`rounded-md px-2 py-0.5 text-sm font-bold ${o.verified ? "bg-sage text-pine" : "bg-sun-soft text-ink"}`}>
+                        {o.verified ? "확인됨" : "확인 대기"}
+                      </span>
+                    </div>
                     <div className="text-sm text-muted">{o.phone} · 가입 {shortDate(o.createdAt)} · 무료공고 {o.freeUsed ? "사용함" : "남음"}</div>
+                    <div className="text-sm">
+                      사업자·기관기호: <b>{o.certNo || "입력 안 함 (예전 가입)"}</b>
+                    </div>
+                    <div className="mt-1.5 flex flex-wrap gap-2">
+                    {o.verified ? (
+                      <button
+                        className="btn-ghost px-3 py-1 text-sm"
+                        disabled={busy}
+                        onClick={() =>
+                          confirm(`${o.name} 확인을 취소할까요? 공고가 목록에서 내려가고 요양보호사 연락처를 볼 수 없게 돼요.`) &&
+                          run("/api/admin/orgs", { id: o.id, action: "unapprove" }, undefined, `${o.name} 확인을 취소했어요.`)
+                        }
+                      >
+                        확인 취소
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-primary px-3 py-1 text-sm"
+                        disabled={busy}
+                        onClick={() =>
+                          confirm(`${o.name}의 번호(${o.certNo || "없음"})를 확인하셨나요?\n승인하면 공고가 공개되고 요양보호사 연락처를 볼 수 있어요.`) &&
+                          run("/api/admin/orgs", { id: o.id, action: "approve" }, undefined, `${o.name}을(를) 승인했어요. 공고가 공개돼요.`)
+                        }
+                      >
+                        승인
+                      </button>
+                    )}
                     <button
-                      className="btn-ghost mt-1.5 px-3 py-1 text-sm"
+                      className="btn-ghost px-3 py-1 text-sm"
                       disabled={busy}
                       onClick={() =>
                         confirm(`${o.name}(${o.phone})에 등록된 번호로 전화해 본인 확인을 하셨나요?\n확인을 누르면 임시 비밀번호를 만들어요.`) &&
@@ -256,6 +291,7 @@ export default function AdminPage() {
                     >
                       임시 비밀번호 발급
                     </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -385,6 +421,9 @@ function SettingsPanel({ settings, busy, run }: { settings: Settings; busy: bool
     paidDays: String(settings.paidDays),
     price: String(settings.price),
     seekerDays: String(settings.seekerDays),
+    minWage: String(settings.minWage ?? 10320),
+    jobInfoRegNo: settings.jobInfoRegNo ?? "",
+    bizNo: settings.bizNo ?? "",
     freeForAll: settings.freeForAll,
   });
   const num = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value.replace(/\D/g, "") });
@@ -400,6 +439,20 @@ function SettingsPanel({ settings, busy, run }: { settings: Settings; busy: bool
       <Row label="유료 결제 금액" unit="원"><input className="field text-right" inputMode="numeric" value={f.price} onChange={num("price")} /></Row>
       <Row label="결제 1회당 노출 기간" unit="일"><input className="field text-right" inputMode="numeric" value={f.paidDays} onChange={num("paidDays")} /></Row>
       <Row label="구직 글 노출 기간" unit="일"><input className="field text-right" inputMode="numeric" value={f.seekerDays} onChange={num("seekerDays")} /></Row>
+      <Row label="최저임금 (시급)" unit="원"><input className="field text-right" inputMode="numeric" value={f.minWage} onChange={num("minWage")} /></Row>
+      <p className="-mt-2 text-sm text-muted">시급 공고가 이 금액보다 낮으면 등록되지 않아요. 해마다 1월에 새 최저임금으로 바꿔 주세요.</p>
+      <div className="space-y-3 border-t border-line pt-4">
+        <p className="font-bold">사이트 하단 표시 정보</p>
+        <label className="block">
+          <span className="field-label">직업정보제공사업 신고번호</span>
+          <input className="field" value={f.jobInfoRegNo} onChange={(e) => setF({ ...f, jobInfoRegNo: e.target.value })} placeholder="신고 후 받은 번호" maxLength={40} />
+        </label>
+        <label className="block">
+          <span className="field-label">사업자등록번호 (서연컴퍼니)</span>
+          <input className="field" value={f.bizNo} onChange={(e) => setF({ ...f, bizNo: e.target.value })} placeholder="000-00-00000" maxLength={20} />
+        </label>
+        <p className="text-sm text-muted">비워 두면 하단에 나오지 않아요. 입력하고 저장하면 모든 페이지 하단에 바로 표시돼요.</p>
+      </div>
       <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-sun-soft p-3">
         <input type="checkbox" className="mt-1 h-5 w-5 accent-[#1e5245]" checked={f.freeForAll} onChange={(e) => setF({ ...f, freeForAll: e.target.checked })} />
         <span>

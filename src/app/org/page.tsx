@@ -12,7 +12,7 @@ import { facilityLabel, type Facility, type Job, type Order } from "@/lib/types"
 
 type MyJob = Job & { live: boolean; daysLeft: number };
 interface MeRes {
-  org: { name: string; phone: string; facility: Facility; freeUsed: boolean };
+  org: { name: string; phone: string; facility: Facility; freeUsed: boolean; verified: boolean };
   jobs: MyJob[];
   orders: Order[];
   settings: { price: number; paidDays: number; freeForAll: boolean };
@@ -122,6 +122,15 @@ function OrgDashboard() {
               </div>
               <Link href="/jobs/new" className="btn-primary">새 공고 올리기</Link>
             </div>
+
+            {!me.org.verified && (
+              <div className="mt-4">
+                <Notice>
+                  <b>기관 확인 중이에요.</b> 관리자가 사업자등록번호(또는 장기요양기관기호)를 확인하면 공고가 공개되고, 요양보호사 연락처도 볼 수
+                  있어요. 노출 기간은 공개되는 날부터 계산돼요.
+                </Notice>
+              </div>
+            )}
 
             <div className="mt-4 grid grid-cols-2 gap-2">
               <Link href="/?tab=seekers" className="btn-ghost">요양보호사 찾기</Link>

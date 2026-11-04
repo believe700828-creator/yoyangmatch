@@ -3,7 +3,7 @@ import { isAdmin } from "@/lib/auth";
 import { getAll, hasRemoteStore } from "@/lib/db";
 import { daysLeft, fail, formatPhone, getLocations, getSettings, handle, isLive } from "@/lib/data";
 import { isTestMode } from "@/lib/toss";
-import type { Job, Order, Org, Seeker } from "@/lib/types";
+import { isVerified, type Job, type Order, type Org, type Seeker } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +36,8 @@ export async function GET() {
         facility: o.facility,
         freeUsed: o.freeUsed,
         createdAt: o.createdAt,
+        certNo: o.certNo ?? "",
+        verified: isVerified(o),
       })),
       orders: orders.filter((o) => o.status === "paid").sort((a, b) => (b.paidAt ?? "").localeCompare(a.paidAt ?? "")),
       system: { storeConnected: hasRemoteStore, paymentTestMode: isTestMode() },

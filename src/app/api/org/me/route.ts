@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getOrgId } from "@/lib/auth";
 import { getAll, getOne } from "@/lib/db";
 import { daysLeft, fail, getSettings, handle, isLive } from "@/lib/data";
-import type { Job, Order, Org } from "@/lib/types";
+import { isVerified, type Job, type Order, type Org } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +25,7 @@ export async function GET() {
       .filter((o) => o.orgId === org.id && o.status === "paid")
       .sort((a, b) => (b.paidAt ?? "").localeCompare(a.paidAt ?? ""));
     return NextResponse.json({
-      org: { name: org.name, phone: org.phone, facility: org.facility, freeUsed: org.freeUsed },
+      org: { name: org.name, phone: org.phone, facility: org.facility, freeUsed: org.freeUsed, verified: isVerified(org) },
       jobs: mine,
       orders: paid,
       settings: { price: settings.price, paidDays: settings.paidDays, freeForAll: settings.freeForAll },

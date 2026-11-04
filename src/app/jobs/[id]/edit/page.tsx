@@ -49,10 +49,12 @@ export default function EditJobPage() {
         ) : (
           <JobForm
             locations={meta.locations}
+            minWage={meta.settings.minWage}
             initial={{
               facility: [job.facility],
               region: job.region,
               area: job.area,
+              address: job.address ?? "",
               payType: job.payType,
               payAmount: toPayInput(job.payAmount),
               schedule: job.schedule,
