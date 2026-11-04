@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { alimtalkReady } from "@/lib/alimtalk";
 import { isAdmin } from "@/lib/auth";
 import { getAll, hasRemoteStore } from "@/lib/db";
 import { daysLeft, fail, formatPhone, getLocations, getSettings, handle, isLive } from "@/lib/data";
@@ -41,12 +40,7 @@ export async function GET() {
         verified: isVerified(o),
       })),
       orders: orders.filter((o) => o.status === "paid").sort((a, b) => (b.paidAt ?? "").localeCompare(a.paidAt ?? "")),
-      system: {
-        storeConnected: hasRemoteStore,
-        paymentTestMode: isTestMode(),
-        alimtalkReady: alimtalkReady(),
-        alertSubscribers: new Set(seekers.filter((s) => s.alertOn && s.status === "active").map((s) => s.phone)).size,
-      },
+      system: { storeConnected: hasRemoteStore, paymentTestMode: isTestMode() },
     });
   });
 }

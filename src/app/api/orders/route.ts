@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { notifyNewJob } from "@/lib/alimtalk";
 import { getOrgId } from "@/lib/auth";
 import { getOne, putOne } from "@/lib/db";
 import { addDays, fail, getSettings, handle, isLive, newId } from "@/lib/data";
@@ -24,7 +23,6 @@ export async function POST(req: Request) {
     if (settings.freeForAll) {
       const base = isLive(job) && job.expiresAt ? new Date(job.expiresAt) : new Date();
       await putOne("jobs", { ...job, status: "active", expiresAt: addDays(settings.paidDays, base) });
-      await notifyNewJob(job.id);
       return NextResponse.json({ activated: true });
     }
 

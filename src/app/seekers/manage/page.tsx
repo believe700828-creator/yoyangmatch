@@ -19,7 +19,6 @@ interface Post {
   createdAt: string;
   live: boolean;
   daysLeft: number;
-  alertOn: boolean;
 }
 
 type Edits = Pick<Post, "name" | "region" | "area" | "facilities" | "hasLicense" | "experience" | "availableTime" | "memo">;
@@ -34,7 +33,7 @@ export default function ManageSeekerPage() {
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
 
-  async function call(action?: string, id?: string, extra?: Record<string, unknown>) {
+  async function call(action?: string, id?: string, extra?: Partial<Edits>) {
     if (action === "delete" && !confirm("이 구직 글을 완전히 지울까요? 되돌릴 수 없어요.")) return false;
     setBusy(true);
     setError("");
@@ -135,28 +134,6 @@ export default function ManageSeekerPage() {
               )}
               {posts.length === 0 && <Notice>남아 있는 구직 글이 없어요.</Notice>}
             </ul>
-            {posts.length > 0 && (
-              <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-white p-4">
-                <div>
-                  <p className="font-bold">지역 새 공고 카카오톡 알림</p>
-                  <p className="text-sm text-muted">
-                    {posts[0].alertOn ? "켜져 있어요. 희망 지역에 맞는 공고가 올라오면 알려 드려요. (하루 최대 5건)" : "꺼져 있어요."}
-                  </p>
-                </div>
-                <button
-                  className={posts[0].alertOn ? "btn-ghost shrink-0" : "btn-primary shrink-0"}
-                  disabled={busy}
-                  onClick={async () => {
-                    const on = !posts[0].alertOn;
-                    if (await call("alert", posts[0].id, { on })) {
-                      setOk(on ? "알림을 켰어요." : "알림을 껐어요. 더 이상 카카오톡 알림이 가지 않아요.");
-                    }
-                  }}
-                >
-                  {posts[0].alertOn ? "알림 끄기" : "알림 켜기"}
-                </button>
-              </div>
-            )}
             {posts.length > 0 && (
               <SeekerPinForm
                 phone={phone}

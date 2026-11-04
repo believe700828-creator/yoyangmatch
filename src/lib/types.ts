@@ -66,8 +66,6 @@ export interface Job {
   status: JobStatus;
   createdAt: string;
   expiresAt: string | null;
-  alertedAt?: string; // 지역 알림을 보낸 시각 (공고당 한 번만)
-  alertCount?: number;
 }
 
 export interface Seeker {
@@ -85,9 +83,6 @@ export interface Seeker {
   status: "active" | "closed" | "hidden";
   createdAt: string;
   expiresAt: string;
-  alertOn?: boolean; // 지역 구인 알림(카카오 알림톡) 신청 여부 — 별도 동의
-  alertAgreedAt?: string;
-  alertLog?: string[]; // 최근 알림 보낸 시각 (하루 상한 계산용)
 }
 
 // 화면에 보내는 구직 정보 (비밀번호·연락처 보호)

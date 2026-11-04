@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { notifyNewJob } from "@/lib/alimtalk";
 import { isAdmin } from "@/lib/auth";
 import { deleteOne, getOne, putOne } from "@/lib/db";
 import { addDays, fail, handle, isLive } from "@/lib/data";
@@ -22,7 +21,6 @@ export async function POST(req: Request) {
       await putOne("jobs", { ...job, status: "active", expiresAt: addDays(d, base) });
     } else if (action === "delete") await deleteOne("jobs", job.id);
     else return fail("처리할 수 없는 요청입니다.");
-    if (action === "show" || action === "extend") await notifyNewJob(job.id); // 아직 알림을 안 보낸 공고만 발송
     return NextResponse.json({ ok: true });
   });
 }

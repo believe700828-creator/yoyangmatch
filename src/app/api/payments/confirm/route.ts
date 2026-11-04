@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { notifyNewJob } from "@/lib/alimtalk";
 import { getOne, putOne } from "@/lib/db";
 import { addDays, fail, handle, isLive } from "@/lib/data";
 import { confirmTossPayment } from "@/lib/toss";
@@ -32,7 +31,6 @@ export async function POST(req: Request) {
     if (job) {
       const base = isLive(job) && job.expiresAt ? new Date(job.expiresAt) : new Date();
       await putOne("jobs", { ...job, status: "active", expiresAt: addDays(order.days, base) });
-      await notifyNewJob(job.id); // 결제로 처음 공개된 경우에만 실제 발송됨
     }
     return NextResponse.json({ ok: true, jobId: order.jobId });
   });

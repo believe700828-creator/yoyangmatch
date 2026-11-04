@@ -55,14 +55,6 @@ export async function POST(req: Request) {
         memo: clean(b.memo, 200),
       });
     }
-    if (b.action === "alert" && target) {
-      // 같은 번호로 등록한 글 모두 함께 켜고 끔
-      const on = Boolean(b.on);
-      const stamp = new Date().toISOString();
-      await Promise.all(
-        mine.map((s) => putOne("seekers", { ...s, alertOn: on, ...(on ? { alertAgreedAt: stamp } : {}) })),
-      );
-    }
     if (b.action === "close" && target) await putOne("seekers", { ...target, status: "closed" });
     if (b.action === "reopen" && target) {
       const settings = await getSettings();
@@ -85,7 +77,6 @@ export async function POST(req: Request) {
           availableTime: s.availableTime,
           memo: s.memo,
           createdAt: s.createdAt,
-          alertOn: Boolean(s.alertOn),
           live: s.status === "active" && daysLeft(s.expiresAt) > 0,
           daysLeft: s.status === "active" ? daysLeft(s.expiresAt) : 0,
         })),
