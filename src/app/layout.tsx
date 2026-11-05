@@ -31,6 +31,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#1e5245",
+  colorScheme: "light", // 휴대폰 다크 모드에서도 밝은 화면 유지
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
