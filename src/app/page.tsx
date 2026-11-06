@@ -62,7 +62,6 @@ function Board() {
 
   const setTab = (t: Tab) => router.replace(t === "jobs" ? "/" : "/?tab=seekers", { scroll: false });
   const filtered = facilities.length > 0 || region !== "";
-  const freeDays = meta?.settings.freeDays ?? 7;
 
   return (
     <>
@@ -103,8 +102,7 @@ function Board() {
           {tab === "jobs" ? (
             <>
               <p className="text-[0.97rem] text-pine-deep">
-                <b>요양기관이신가요?</b> 회원가입 후 공고를 올리면{" "}
-                {meta?.settings.freeForAll ? "지금은 무료로 노출돼요." : `첫 공고는 ${freeDays}일간 무료로 노출돼요.`}
+                <b>요양보호사 구하기 어려우시죠?</b> 우리 지역에서 일할 요양보호사에게 공고를 보여 드려요.
               </p>
               <Link href="/jobs/new" className="btn-primary shrink-0">
                 구인공고 올리기
