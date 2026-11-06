@@ -84,7 +84,10 @@ export interface Seeker {
   status: "active" | "closed" | "hidden";
   createdAt: string;
   expiresAt: string;
+  phonePublic?: boolean; // 확인된 기관에 번호 공개 여부 (값이 없으면 예전 등록 = 공개)
 }
+
+export const isPhonePublic = (s: Pick<Seeker, "phonePublic">) => s.phonePublic !== false;
 
 // 화면에 보내는 구직 정보 (비밀번호·연락처 보호)
 export interface PublicSeeker {
@@ -98,7 +101,8 @@ export interface PublicSeeker {
   availableTime: string;
   memo: string;
   createdAt: string;
-  phone: string | null; // 로그인한 기관에게만
+  phone: string | null; // 확인된 기관 + 요양보호사가 공개를 선택한 경우에만
+  phonePublic: boolean;
 }
 
 export interface PublicJob extends Omit<Job, "orgId"> {

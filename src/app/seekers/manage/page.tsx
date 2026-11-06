@@ -19,6 +19,7 @@ interface Post {
   createdAt: string;
   live: boolean;
   daysLeft: number;
+  phonePublic: boolean;
 }
 
 type Edits = Pick<Post, "name" | "region" | "area" | "facilities" | "hasLicense" | "experience" | "availableTime" | "memo">;
@@ -33,7 +34,7 @@ export default function ManageSeekerPage() {
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
 
-  async function call(action?: string, id?: string, extra?: Partial<Edits>) {
+  async function call(action?: string, id?: string, extra?: Record<string, unknown>) {
     if (action === "delete" && !confirm("이 구직 글을 완전히 지울까요? 되돌릴 수 없어요.")) return false;
     setBusy(true);
     setError("");
@@ -134,6 +135,30 @@ export default function ManageSeekerPage() {
               )}
               {posts.length === 0 && <Notice>남아 있는 구직 글이 없어요.</Notice>}
             </ul>
+            {posts.length > 0 && (
+              <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-white p-4">
+                <div>
+                  <p className="font-bold">휴대폰 번호 공개</p>
+                  <p className="text-sm text-muted">
+                    {posts[0].phonePublic
+                      ? "확인된 기관이 번호를 볼 수 있어요."
+                      : "번호가 기관에 보이지 않아요. 공고를 보고 직접 연락해 주세요."}
+                  </p>
+                </div>
+                <button
+                  className={posts[0].phonePublic ? "btn-ghost shrink-0" : "btn-primary shrink-0"}
+                  disabled={busy}
+                  onClick={async () => {
+                    const on = !posts[0].phonePublic;
+                    if (await call("phone", posts[0].id, { on })) {
+                      setOk(on ? "번호를 확인된 기관에 공개했어요." : "번호를 비공개로 바꿨어요. 이제 기관에 번호가 보이지 않아요.");
+                    }
+                  }}
+                >
+                  {posts[0].phonePublic ? "비공개로 바꾸기" : "공개로 바꾸기"}
+                </button>
+              </div>
+            )}
             {posts.length > 0 && (
               <SeekerPinForm
                 phone={phone}

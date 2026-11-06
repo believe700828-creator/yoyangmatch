@@ -20,6 +20,7 @@ export default function NewSeekerPage() {
   const [availableTime, setAvailableTime] = useState("");
   const [memo, setMemo] = useState("");
   const [agree, setAgree] = useState(false);
+  const [phonePublic, setPhonePublic] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
@@ -27,9 +28,10 @@ export default function NewSeekerPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    if (phonePublic === null) return setError("휴대폰 번호를 기관에 공개할지 골라 주세요.");
     setBusy(true);
     try {
-      await api("/api/seekers", { name, phone, password, region, area, facilities, hasLicense, experience, availableTime, memo, agree });
+      await api("/api/seekers", { name, phone, password, region, area, facilities, hasLicense, experience, availableTime, memo, agree, phonePublic });
       setDone(true);
       window.scrollTo({ top: 0 });
     } catch (err) {
@@ -68,7 +70,7 @@ export default function NewSeekerPage() {
               <div>
                 <label className="field-label" htmlFor="sk-phone">휴대폰 번호</label>
                 <input id="sk-phone" className="field" inputMode="tel" value={phone} onChange={(e) => setPhone(formatPhoneInput(e.target.value))} placeholder="010-0000-0000" autoComplete="tel" required />
-                <p className="mt-1 text-sm text-muted">기관 회원에게만 보여요.</p>
+                <p className="mt-1 text-sm text-muted">공개 여부는 아래에서 직접 골라요.</p>
               </div>
             </div>
 
@@ -80,6 +82,33 @@ export default function NewSeekerPage() {
             <div>
               <span className="field-label">희망 근무 형태 <span className="font-normal text-muted">(여러 개 선택 가능)</span></span>
               <FacilityChips value={facilities} onChange={setFacilities} multiple />
+            </div>
+
+            <div>
+              <span className="field-label">휴대폰 번호 공개</span>
+              <div className="grid gap-2" role="radiogroup" aria-label="휴대폰 번호 공개 여부">
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={phonePublic === true}
+                  onClick={() => setPhonePublic(true)}
+                  className={`rounded-xl border px-4 py-3 text-left ${phonePublic === true ? "border-pine bg-sage" : "border-line bg-white"}`}
+                >
+                  <b className="block">확인된 기관에 번호 공개</b>
+                  <span className="text-sm text-muted">관리자가 확인한 요양기관이 보고 먼저 연락할 수 있어요.</span>
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={phonePublic === false}
+                  onClick={() => setPhonePublic(false)}
+                  className={`rounded-xl border px-4 py-3 text-left ${phonePublic === false ? "border-pine bg-sage" : "border-line bg-white"}`}
+                >
+                  <b className="block">번호 비공개</b>
+                  <span className="text-sm text-muted">번호는 보이지 않아요. 마음에 드는 공고를 보고 직접 연락하시면 돼요.</span>
+                </button>
+              </div>
+              <p className="mt-1 text-sm text-muted">나중에 &lsquo;내 구직 글 관리&rsquo;에서 언제든 바꿀 수 있어요.</p>
             </div>
 
             <div>
@@ -117,7 +146,7 @@ export default function NewSeekerPage() {
               <ul className="mt-1 list-disc space-y-0.5 pl-5 text-muted">
                 <li>수집 항목: 이름, 휴대폰 번호, 희망 지역·근무 형태, 경력 등 입력하신 내용</li>
                 <li>목적: 요양기관에 구직 정보 제공 및 채용 연락</li>
-                <li>제공받는 자: 사이트에 로그인한 요양기관 회원 (연락처·구직 정보)</li>
+                <li>제공받는 자: 관리자가 확인한 요양기관 회원 (구직 정보, 번호 공개를 고른 경우 휴대폰 번호)</li>
                 <li>보관: 노출 기간 종료 후 30일 뒤 자동 삭제, 그 전에도 언제든 삭제 가능</li>
                 <li>동의하지 않으실 수 있으며, 이 경우 등록할 수 없어요.</li>
               </ul>

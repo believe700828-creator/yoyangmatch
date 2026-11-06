@@ -27,7 +27,7 @@ export async function GET() {
       seekers: seekers.sort(byNew).map((s) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { pwHash, ...rest } = s;
-        return { ...rest, phone: formatPhone(s.phone), daysLeft: daysLeft(s.expiresAt) };
+        return { ...rest, phone: formatPhone(s.phone), daysLeft: daysLeft(s.expiresAt), phonePublic: s.phonePublic !== false };
       }),
       orgs: orgs.sort(byNew).map((o) => ({
         id: o.id,

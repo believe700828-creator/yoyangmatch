@@ -113,7 +113,7 @@ function Board() {
           ) : (
             <>
               <p className="text-[0.97rem] text-pine-deep">
-                <b>요양보호사님이신가요?</b> 가입 없이 1분이면 구직 등록이 끝나요. 연락처는 기관 회원에게만 보여요.
+                <b>요양보호사님이신가요?</b> 가입 없이 1분이면 구직 등록이 끝나요. 번호 공개 여부는 직접 고를 수 있어요.
               </p>
               <div className="flex shrink-0 flex-col gap-2 sm:items-end">
                 <Link href="/seekers/new" className="btn-primary">
@@ -297,6 +297,10 @@ function SeekerItem({ s }: { s: PublicSeeker }) {
           <a href={`tel:${s.phone.replace(/\D/g, "")}`} className="btn-primary w-full">
             <PhoneIcon /> {s.phone}
           </a>
+        ) : !s.phonePublic ? (
+          <p className="rounded-xl bg-[#f1f3f2] px-3 py-3 text-center text-[0.92rem] text-muted">
+            이 분은 번호를 공개하지 않았어요. 공고를 올려 두시면 보고 직접 연락할 수 있어요.
+          </p>
         ) : (
           <Link href="/org" className="btn-ghost w-full text-muted">
             기관 로그인 후 연락처 보기

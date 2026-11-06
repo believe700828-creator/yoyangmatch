@@ -7,6 +7,7 @@ import { facilityLabel, REGIONS, type Facility, type Job, type Location, type Or
 
 type AdminJob = Job & { live: boolean; daysLeft: number };
 interface AdminSeeker {
+  phonePublic: boolean;
   id: string;
   name: string;
   phone: string;
@@ -209,6 +210,7 @@ export default function AdminPage() {
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   <b className="text-[1rem]">{s.name}</b>
                   <span>{s.phone}</span>
+                  <span className="text-muted">{s.phonePublic ? "번호 공개" : "번호 비공개"}</span>
                   <span className="text-muted">{s.region} {s.area} · {s.facilities.map(facilityLabel).join(", ")}</span>
                   <span className={`rounded-md px-2 py-0.5 font-bold ${s.status === "active" && s.daysLeft > 0 ? "bg-sage text-pine" : "bg-[#eef0ef] text-muted"}`}>
                     {s.status === "hidden" ? "숨김" : s.status === "closed" ? "마감" : s.daysLeft > 0 ? `노출 ${s.daysLeft}일 남음` : "기간 끝남"}

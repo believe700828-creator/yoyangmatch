@@ -43,6 +43,7 @@ export async function POST(req: Request) {
     if (!/^\d{4}$/.test(password)) return fail("관리용 비밀번호는 숫자 4자리로 정해 주세요.");
     if (!REGIONS.includes(region) || !area) return fail("희망 근무 지역을 선택해 주세요.");
     if (facilities.length === 0) return fail("희망 근무 형태를 하나 이상 골라 주세요.");
+    if (typeof b.phonePublic !== "boolean") return fail("휴대폰 번호를 기관에 공개할지 골라 주세요.");
     if (!b.agree) return fail("개인정보 수집·이용에 동의해 주셔야 등록할 수 있습니다.");
 
     const settings = await getSettings();
@@ -55,6 +56,7 @@ export async function POST(req: Request) {
       area,
       facilities,
       hasLicense: Boolean(b.hasLicense),
+      phonePublic: b.phonePublic,
       experience: clean(b.experience, 60),
       availableTime: clean(b.availableTime, 80),
       memo: clean(b.memo, 200),

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 import { deleteOne, getAll, putOne } from "@/lib/db";
 import { addDays, clean, daysLeft, fail, getSettings, handle, onlyDigits } from "@/lib/data";
-import { FACILITIES, REGIONS, type Facility, type Region, type Seeker } from "@/lib/types";
+import { FACILITIES, REGIONS, isPhonePublic, type Facility, type Region, type Seeker } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +55,11 @@ export async function POST(req: Request) {
         memo: clean(b.memo, 200),
       });
     }
+    if (b.action === "phone" && target) {
+      // 같은 번호로 등록한 글 모두 함께 바꿈
+      const on = Boolean(b.on);
+      await Promise.all(mine.map((s) => putOne("seekers", { ...s, phonePublic: on })));
+    }
     if (b.action === "close" && target) await putOne("seekers", { ...target, status: "closed" });
     if (b.action === "reopen" && target) {
       const settings = await getSettings();
@@ -77,6 +82,7 @@ export async function POST(req: Request) {
           availableTime: s.availableTime,
           memo: s.memo,
           createdAt: s.createdAt,
+          phonePublic: isPhonePublic(s),
           live: s.status === "active" && daysLeft(s.expiresAt) > 0,
           daysLeft: s.status === "active" ? daysLeft(s.expiresAt) : 0,
         })),

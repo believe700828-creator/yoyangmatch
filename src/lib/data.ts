@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import { NextResponse } from "next/server";
 import { getAll, getOne, putOne, StoreNotConfiguredError } from "./db";
-import type { Job, Location, PublicJob, PublicSeeker, Region, Seeker, Settings } from "./types";
+import { isPhonePublic, type Job, type Location, type PublicJob, type PublicSeeker, type Region, type Seeker, type Settings } from "./types";
 
 export const DEFAULT_SETTINGS: Settings = {
   id: "main",
@@ -101,7 +101,8 @@ export function toPublicSeeker(s: Seeker, showPhone: boolean): PublicSeeker {
     availableTime: s.availableTime,
     memo: s.memo,
     createdAt: s.createdAt,
-    phone: showPhone ? formatPhone(s.phone) : null,
+    phone: showPhone && isPhonePublic(s) ? formatPhone(s.phone) : null,
+    phonePublic: isPhonePublic(s),
   };
 }
 
