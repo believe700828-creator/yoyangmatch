@@ -31,8 +31,9 @@ export default function NewJobPage() {
           <div className="mt-4">
             <OrgAuth
               onDone={reload}
-              intro={`공고는 기관 회원만 올릴 수 있어요. 가입은 전화번호와 비밀번호만 있으면 돼요. ${
-                meta.settings.freeForAll ? "지금은 무료 이벤트 기간이에요." : `첫 공고는 ${meta.settings.freeDays}일간 무료예요.`
+              intro={`공고는 기관 회원만 올릴 수 있어요. 가입은 전화번호와 비밀번호만 있으면 돼요.${
+                // 유료로 바뀌면(무료 이벤트 끔) 요금 조건 안내가 자동으로 붙음
+                meta.settings.freeForAll ? "" : ` 첫 공고는 ${meta.settings.freeDays}일간 무료예요.`
               }`}
             />
           </div>
@@ -87,7 +88,7 @@ export default function NewJobPage() {
                 )}
                 {isFree ? (
                   <Notice tone="ok">
-                    {s!.freeForAll ? `무료 이벤트 기간이라 ${s!.paidDays}일간 무료로 노출돼요.` : `첫 공고라서 ${s!.freeDays}일간 무료로 노출돼요.`}
+                    {s!.freeForAll ? `올리면 ${s!.paidDays}일 동안 목록에 보여요.` : `첫 공고라서 ${s!.freeDays}일간 무료로 노출돼요.`}
                   </Notice>
                 ) : (
                   <Notice>

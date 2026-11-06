@@ -61,7 +61,7 @@ function OrgDashboard() {
     try {
       const r = await startJobPayment(jobId);
       if (r === "activated") {
-        setNotice("무료 이벤트 기간이라 결제 없이 노출 기간이 늘어났어요.");
+        setNotice("노출 기간을 늘렸어요.");
         load();
       }
     } catch (e) {
@@ -143,7 +143,7 @@ function OrgDashboard() {
             <h2 className="mt-8 text-[1.2rem] font-extrabold">내 공고</h2>
             <p className="text-sm text-muted">
               {me.settings.freeForAll
-                ? "지금은 무료 이벤트 기간이에요. 연장도 무료예요."
+                ? `공고는 올린 날부터 ${me.settings.paidDays}일 동안 보이고, 필요하면 연장할 수 있어요.`
                 : `노출 연장은 ${me.settings.paidDays}일에 ${won(me.settings.price)}이에요.`}
             </p>
 
