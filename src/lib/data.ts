@@ -66,7 +66,8 @@ export function formatPhone(s: string): string {
 }
 
 export function maskName(name: string): string {
-  const n = name.trim();
+  // 띄어쓰기·보이지 않는 문자는 빼고 글자 수를 셈 (예: "김 영윤" → 김○윤)
+  const n = name.replace(/[\s\u200b-\u200d\ufeff]/g, "");
   if (n.length <= 1) return n + "○";
   if (n.length === 2) return n[0] + "○";
   return n[0] + "○".repeat(n.length - 2) + n[n.length - 1];
