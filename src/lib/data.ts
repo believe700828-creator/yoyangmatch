@@ -65,9 +65,13 @@ export function formatPhone(s: string): string {
   return s;
 }
 
+// 이름에서 글자·숫자만 남김 (띄어쓰기, 점, 눈에 안 보이는 문자, 한글 채움 문자 제거)
+export const nameLetters = (name: string) =>
+  name.replace(/[\u115F\u1160\u3164\uFFA0]/g, "").replace(/[^\p{L}\p{N}]/gu, "");
+
 export function maskName(name: string): string {
-  // 띄어쓰기·보이지 않는 문자는 빼고 글자 수를 셈 (예: "김 영윤" → 김○윤)
-  const n = name.replace(/[\s\u200b-\u200d\ufeff]/g, "");
+  // 예: "김 영윤", "김ㅤ영윤" → 김○윤
+  const n = nameLetters(name);
   if (n.length <= 1) return n + "○";
   if (n.length === 2) return n[0] + "○";
   return n[0] + "○".repeat(n.length - 2) + n[n.length - 1];

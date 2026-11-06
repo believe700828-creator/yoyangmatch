@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getOrgId, hashPassword } from "@/lib/auth";
 import { deleteOne, getAll, getOne, putOne } from "@/lib/db";
-import { addDays, clean, fail, getSettings, handle, newId, onlyDigits, toPublicSeeker } from "@/lib/data";
+import { addDays, clean, fail, getSettings, handle, nameLetters, newId, onlyDigits, toPublicSeeker } from "@/lib/data";
 import { FACILITIES, REGIONS, isVerified, type Facility, type Org, type Region, type Seeker } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +29,7 @@ export async function GET() {
 export async function POST(req: Request) {
   return handle(async () => {
     const b = await req.json();
-    const name = clean(b.name, 20);
+    const name = nameLetters(clean(b.name, 30)).slice(0, 20);
     const phone = onlyDigits(b.phone);
     const password = String(b.password ?? "");
     const region = b.region as Region;

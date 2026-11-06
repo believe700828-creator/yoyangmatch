@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 import { deleteOne, getAll, putOne } from "@/lib/db";
-import { addDays, clean, daysLeft, fail, getSettings, handle, onlyDigits } from "@/lib/data";
+import { addDays, clean, daysLeft, fail, getSettings, handle, nameLetters, onlyDigits } from "@/lib/data";
 import { FACILITIES, REGIONS, isPhonePublic, type Facility, type Region, type Seeker } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     if (b.action && !target) return fail("해당 글을 찾을 수 없습니다.", 404);
 
     if (b.action === "update" && target) {
-      const name = clean(b.name, 20);
+      const name = nameLetters(clean(b.name, 30)).slice(0, 20);
       const region = b.region as Region;
       const area = clean(b.area, 40);
       const facilities = (Array.isArray(b.facilities) ? b.facilities : []).filter((f: string) =>
